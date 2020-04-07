@@ -20,6 +20,7 @@ import Add
 
 # Fermeture des figures ouvertes
 plt.close('all') 
+
 donnees_accX = [[],[],[],[]] # haut avec, haut sans, bas avec, bas sans
 donnees_GF = [[],[],[],[]] 
 donnees_LF = [[],[],[],[]]  
@@ -178,6 +179,6 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                     fig.savefig("figures\%s_%d_acc_forces_dGF.png" %(s,trial)) 
                     
     if add:
-        Add.superpose(Name,to_cancel,donnees_accX,donnees_GF,donnees_LF,donnees_dGF)
+        Add.superpose(Name)
     elif Delai:
         Add.delai(Name)                                               

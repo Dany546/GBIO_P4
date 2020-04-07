@@ -37,7 +37,7 @@ def delai(Name):
     # écris tout dans un fichier texte   
     try:     
         new_file = open("decalage\%s" %(name),"w")
-        blocs = ['haut_avec','haut_sans','bas_avec','bas_sans']  
+        blocs = ['haut','bas']  
         for i in range(2): 
             new_file.write(blocs[i]+':\n')
             for j in range(3): 
@@ -61,15 +61,15 @@ def decal(signal_1,signal_2):
     
     return abs(pk_1[0]-pk_2[0])*5/4   # 1000/800 = 5/4 
     
-def superpose(Name,To_cancel,donnees_accX,donnees_GF,donnees_LF,donnees_dGF):
+def superpose(Name):
     global accX, GF, LF, dGF, name, to_cancel
          
     name = Name  
-    to_cancel = To_cancel 
-    accX = donnees_accX
-    GF = donnees_GF
-    LF = donnees_LF
-    dGF = donnees_dGF 
+    to_cancel = gbio.to_cancel 
+    accX = gbio.donnees_accX
+    GF = gbio.donnees_GF
+    LF = gbio.donnees_LF
+    dGF = gbio.donnees_dGF
     
     fig = plt.figure(figsize = [8,10])
     ax  = fig.subplots(4,2)
@@ -88,7 +88,7 @@ def superpose(Name,To_cancel,donnees_accX,donnees_GF,donnees_LF,donnees_dGF):
     ax[3,1].set_xlabel("Time [ms]", fontsize=13)
     
     new_accX,new_GF,new_LF,new_dGF = Sum()
-    time = np.arange(0,1200)
+    time = np.arange(0,1200*5/4,5/4)
      
     colors = ['r','b','r','b']
     cols = [0,0,1,1]
@@ -105,8 +105,8 @@ def superpose(Name,To_cancel,donnees_accX,donnees_GF,donnees_LF,donnees_dGF):
     fig.legend(lines, ('avec anticipation', 'sans anticipation'), loc='upper right')    
     fig.savefig("figures\Add\%s_acc_forces_dGF.png" %(name)) 
     
-def Sum():   
-    global accX, GF, LF, dGF, name
+def Sum():
+    global accX, GF, LF, dGF, name, to_cancel
     
     new_donnees_accX = [[None,None,None] for i in range(4)] 
     new_donnees_GF = [[None,None,None] for i in range(4)]   
@@ -147,7 +147,7 @@ def Sum():
                     
     return new_donnees_accX, new_donnees_GF, new_donnees_LF, new_donnees_dGF                        
                     
-def block_order():
+def block_order(): 
     global name, to_cancel
     
     first = 0 ; Next = 0

@@ -30,13 +30,13 @@ import gbio_example_script_collisions_dany as gbio
 # il faut modifier ces variables pour dire quoi faire (add prévaut sur Delai qui prévaut sur zoom)
 
 # mettre que les sujets dont on veut les plots
-name = 'florent' # put the subjects' names in here
+name = 'walid' # put the subjects' names in here
 
 # mettre True pour faire les moyennes sur les masses et superposer les courbes
-Add = True
+Add = True #False
 
 # mettre True pour calculer les décalages moyen entre grip force avec et grip force sans  
-delai = False
+delai = True
 
 # mettre True pour zoomer sur un choc en particulier
 zoom = False 

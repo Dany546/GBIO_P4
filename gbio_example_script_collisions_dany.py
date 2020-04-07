@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 import os
-
+from integ import integ as Positions
 import glm_data_processing as glm
 import derive as der
 import Add 
@@ -27,6 +27,8 @@ donnees_LF = [[],[],[],[]]
 donnees_dGF = [[],[],[],[]] 
 to_cancel = [[],[],[],[]]
 delai = [[],[],[],[]]
+vit = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
+dis = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
 
 file=os.listdir("mesures") 
 subjects=[path.split('_')[0]+'_'+path.split('_')[1]+'_'+path.split('_')[2] for i,path in enumerate(file) if i%3 == 0] 
@@ -84,7 +86,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                 LFh   = glm.filter_signal(LFh,   fs = freqAcq, fc = freqFiltForces)
                 
                 #%% CUTTING THE TASK INTO SEGMENTS (your first task)
-                pk = signal.find_peaks(abs(accX),prominence=9,distance=2000) # avant:prominence=9,distance=1000
+                pk = signal.find_peaks(abs(accX),prominence=4.5,distance=2000) # avant:prominence=9,distance=1000
                 ipk = pk[0][0:10]
                 
                 if ipk[-1]-ipk[-2]>9000*0.8:
@@ -111,13 +113,21 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             donnees_accX[0].append([accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_GF[0].append([GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[0].append([LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_dGF[0].append([dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_dGF[0].append([dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+                            for st,e in zip(cycle_starts,cycle_ends):
+                                v,d =Positions(accX[st:e],time[st:e])
+                                vit[0][trial-1].append(v) 
+                                dis[0][trial-1].append(d) 
                             to_cancel[0].append([])  
                         elif block == 'sans':
                             donnees_accX[1].append([accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_GF[1].append([GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[1].append([LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_dGF[1].append([dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+                            for st,e in zip(cycle_starts,cycle_ends):
+                                v,d =Positions(accX[st:e],time[st:e])
+                                vit[1][trial-1].append(v) 
+                                dis[1][trial-1].append(d)  
                             to_cancel[1].append([])    
                     elif hb == 'bas':
                         if block == 'avec':
@@ -125,12 +135,20 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             donnees_GF[2].append([GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[2].append([LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_dGF[2].append([dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            for st,e in zip(cycle_starts,cycle_ends):
+                                v,d =Positions(accX[st:e],time[st:e])
+                                vit[2][trial-1].append(v) 
+                                dis[2][trial-1].append(d) 
                             to_cancel[2].append([])     
                         elif block == 'sans':
                             donnees_accX[3].append([accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_GF[3].append([GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[3].append([LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_dGF[3].append([dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+                            for st,e in zip(cycle_starts,cycle_ends):
+                                v,d =Positions(accX[st:e],time[st:e])
+                                vit[3][trial-1].append(v) 
+                                dis[3][trial-1].append(d) 
                             to_cancel[3].append([])    
                 else:    
                     ax  = fig.subplots(3,1) 

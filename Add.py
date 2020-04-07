@@ -15,6 +15,8 @@ accX = None
 GF = None
 LF = None
 dGF = None
+vit = None
+dis = None
 
 def delai(Name):
     global accX, GF, LF, dGF, name, to_cancel  
@@ -62,7 +64,7 @@ def decal(signal_1,signal_2):
     return abs(pk_1[0]-pk_2[0])*5/4   # 1000/800 = 5/4 
     
 def superpose(Name):
-    global accX, GF, LF, dGF, name, to_cancel
+    global accX, GF, LF, dGF, name, to_cancel, vit, dis
          
     name = Name  
     to_cancel = gbio.to_cancel 
@@ -70,6 +72,8 @@ def superpose(Name):
     GF = gbio.donnees_GF
     LF = gbio.donnees_LF
     dGF = gbio.donnees_dGF
+    vit = gbio.vit
+    dis = gbio.dis
     
     fig = plt.figure(figsize = [8,10])
     ax  = fig.subplots(4,2)
@@ -87,7 +91,7 @@ def superpose(Name):
     ax[3,0].set_xlabel("Time [ms]", fontsize=13)
     ax[3,1].set_xlabel("Time [ms]", fontsize=13)
     
-    new_accX,new_GF,new_LF,new_dGF = Sum()
+    new_accX,new_GF,new_LF,new_dGF,new_vit,new_dis = Sum()
     time = np.arange(0,1200*5/4,5/4)
      
     colors = ['r','b','r','b']
@@ -100,18 +104,49 @@ def superpose(Name):
             lines[i] = ax[0,col].plot(time,item_accX,color)
             ax[1,col].plot(time,item_LF,color)
             ax[2,col].plot(time,item_GF,color)
-            ax[3,col].plot(time,item_dGF,color)
+            ax[3,col].plot(time,item_dGF,color) 
     lines = (lines[0][0],lines[1][0])  
     fig.legend(lines, ('avec anticipation', 'sans anticipation'), loc='upper right')    
     fig.savefig("figures\Add\%s_acc_forces_dGF.png" %(name)) 
     
+    fig = plt.figure(figsize = [8,10])
+    ax  = fig.subplots(3,2)
+    
+    fig.suptitle(name, fontsize=16)
+    
+    ax[0,0].set_title("Haut", fontsize=14)
+    ax[0,1].set_title("Bas", fontsize=14)
+    
+    ax[0,0].set_ylabel("Acceleration [m/s^2]", fontsize=13)
+    ax[1,0].set_ylabel("Vitesse [m/s]", fontsize=13)
+    ax[2,0].set_ylabel("Déplacement [m]", fontsize=13) 
+    
+    ax[2,0].set_xlabel("Time [ms]", fontsize=13)
+    ax[2,1].set_xlabel("Time [ms]", fontsize=13) 
+     
+    colors = ['r','b','r','b']
+    cols = [0,0,1,1]
+    lines = [None,None,None,None]
+    for i in range(4):
+        col = cols[i]
+        color = colors[i] 
+        for item_accX,item_vit,item_dis in zip(new_accX[i], new_vit[i], new_dis[i]):
+            lines[i] = ax[0,col].plot(time,item_accX,color)
+            ax[1,col].plot(time,item_vit,color)
+            ax[2,col].plot(time,item_dis,color) 
+    lines = (lines[0][0],lines[1][0])  
+    fig.legend(lines, ('avec anticipation', 'sans anticipation'), loc='upper right') 
+    fig.show()
+    
 def Sum():
-    global accX, GF, LF, dGF, name, to_cancel
+    global accX, GF, LF, dGF, name, to_cancel, vit, dis
     
     new_donnees_accX = [[None,None,None] for i in range(4)] 
     new_donnees_GF = [[None,None,None] for i in range(4)]   
     new_donnees_LF = [[None,None,None] for i in range(4)]   
-    new_donnees_dGF = [[None,None,None] for i in range(4)]   
+    new_donnees_dGF = [[None,None,None] for i in range(4)]  
+    new_vit = [[None,None,None] for i in range(4)]    
+    new_dis = [[None,None,None] for i in range(4)]   
     
     # somme sur chaque masse pour les 3 memes blocs
     ind,blocks_ind,choc_number = block_order() 
@@ -123,18 +158,22 @@ def Sum():
                     k = [k]
                 for l in k:
                     L = 0 
-                    for item_accX,item_GF,item_LF,item_dGF in zip(accX[ind_1][ind_2],GF[ind_1][ind_2],LF[ind_1][ind_2],dGF[ind_1][ind_2]):
+                    for item_accX,item_GF,item_LF,item_dGF,item_vit,item_dis in zip(accX[ind_1][ind_2],GF[ind_1][ind_2],LF[ind_1][ind_2],dGF[ind_1][ind_2],vit[ind_1][ind_2],dis[ind_1][ind_2]):
                         if l == L: 
                             if np.all(new_donnees_accX[ind_1][j]) == None:
                                 new_donnees_accX[ind_1][j] = item_accX
                                 new_donnees_GF[ind_1][j] = item_GF
                                 new_donnees_LF[ind_1][j] = item_LF 
                                 new_donnees_dGF[ind_1][j] = item_dGF 
+                                new_vit[ind_1][j] = item_vit 
+                                new_dis[ind_1][j] = item_dis 
                             else:
                                 new_donnees_accX[ind_1][j] += item_accX
                                 new_donnees_GF[ind_1][j] += item_GF
                                 new_donnees_LF[ind_1][j] += item_LF 
                                 new_donnees_dGF[ind_1][j] += item_dGF 
+                                new_vit[ind_1][j] += item_vit 
+                                new_dis[ind_1][j] += item_dis 
                         L += 1        
     
     # termine le calcul de la moyenne en divisant par le nombre de chocs correspondant
@@ -144,8 +183,10 @@ def Sum():
             new_donnees_GF[i][j] = new_donnees_GF[i][j] / choc_number[i][j]
             new_donnees_LF[i][j] = new_donnees_LF[i][j] / choc_number[i][j]
             new_donnees_dGF[i][j] = new_donnees_dGF[i][j] / choc_number[i][j] 
+            new_vit[i][j] = new_vit[i][j] / choc_number[i][j] 
+            new_dis[i][j] = new_dis[i][j] / choc_number[i][j] 
                     
-    return new_donnees_accX, new_donnees_GF, new_donnees_LF, new_donnees_dGF                        
+    return new_donnees_accX, new_donnees_GF, new_donnees_LF, new_donnees_dGF , new_vit, new_dis                       
                     
 def block_order(): 
     global name, to_cancel

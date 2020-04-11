@@ -14,12 +14,21 @@ def err(Name):
     global ha, hs, ba, bs
     
     if Name == 'alex':
-        bs[0] = [3]
+        bs[0] = [3,10] 
+        ba[1] = [10]
         ha[1] = [7]
-    elif Name == 'walid':
-        ha[0] = []
+        hs[0] = [6]
+    elif Name == 'walid': 
+        ba[2] = [1,4,6] 
+        bs[0] = [4]
+        bs[1] = [10]
     elif Name == 'victor':
         ha[0] = [5]
+        ha[1] = [8]
+        hs[1] = [3]
+        bs[0] = [1]
+        bs[2] = [4]
+        ba[0] = [2,8,9]
     elif Name == 'florent':     
         ba[0] = [2]
         ha[1] = [7]

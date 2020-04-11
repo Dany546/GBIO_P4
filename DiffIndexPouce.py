@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Mar 25 13:40:44 2020
-
+Pour vérifier que le manipulandum n'est pas trop penché (normalement si il est penché on devrait voir une différence
+ entre les forces exercées par le pouce et l'index).
+On calcule ici les différences moyennes.
 @author: alexandreloffet
 """
 

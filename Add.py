@@ -28,7 +28,7 @@ def delai(Name):
     LF = gbio.donnees_LF
     dGF = gbio.donnees_dGF
     
-    new_accX,new_GF,new_LF,new_dGF = Sum()
+    new_accX,new_GF,new_LF,new_dGF,new_vit,new_dis = Sum()
         
     new_delai = [[None,None,None],[None,None,None]] 
       
@@ -96,17 +96,24 @@ def superpose(Name):
      
     colors = ['r','b','r','b']
     cols = [0,0,1,1]
-    lines = [None,None,None,None]
+    lines1 = [None,None,None,None]
+    lines2 = [None,None,None]
+    line_type = [':','--',''] 
     for i in range(4):
         col = cols[i]
         color = colors[i] 
+        j = 0
         for item_accX,item_GF,item_LF,item_dGF in zip(new_accX[i],new_GF[i],new_LF[i],new_dGF[i]):
-            lines[i] = ax[0,col].plot(time,item_accX,color)
-            ax[1,col].plot(time,item_LF,color)
-            ax[2,col].plot(time,item_GF,color)
-            ax[3,col].plot(time,item_dGF,color) 
-    lines = (lines[0][0],lines[1][0])  
-    fig.legend(lines, ('avec anticipation', 'sans anticipation'), loc='upper right')    
+            Color = line_type[j]+color
+            lines1[i] = ax[0,col].plot(time,item_accX,Color)
+            lines2[j] = ax[1,col].plot(time,item_LF,Color)
+            ax[2,col].plot(time,item_GF,Color)
+            ax[3,col].plot(time,item_dGF,Color) 
+            j+=1
+    lines1 = (lines1[0][0],lines1[1][0])  
+    lines2 = (lines2[0][0],lines2[1][0],lines2[2][0])  
+    fig.legend(lines1, ('avec anticipation', 'sans anticipation'), loc='upper right') 
+    fig.legend(lines2, ('masse 1', 'masse 2', 'masse 3'), loc='upper right', bbox_to_anchor=(1, 0.95))    
     fig.savefig("figures\Add\%s_acc_forces_dGF.png" %(name)) 
     
     fig = plt.figure(figsize = [8,10])
@@ -119,23 +126,30 @@ def superpose(Name):
     
     ax[0,0].set_ylabel("Acceleration [m/s^2]", fontsize=13)
     ax[1,0].set_ylabel("Vitesse [m/s]", fontsize=13)
-    ax[2,0].set_ylabel("Déplacement [m]", fontsize=13) 
+    ax[2,0].set_ylabel("Déplacement [cm]", fontsize=13) 
     
     ax[2,0].set_xlabel("Time [ms]", fontsize=13)
     ax[2,1].set_xlabel("Time [ms]", fontsize=13) 
-     
-    colors = ['r','b','r','b']
-    cols = [0,0,1,1]
-    lines = [None,None,None,None]
+    
+    time = np.arange(0,1200*5/4,5/4)
+       
+    lines1 = [None,None,None,None]
+    lines2 = [None,None,None]
     for i in range(4):
         col = cols[i]
-        color = colors[i] 
+        color = colors[i]  
+        j = 0
         for item_accX,item_vit,item_dis in zip(new_accX[i], new_vit[i], new_dis[i]):
-            lines[i] = ax[0,col].plot(time,item_accX,color)
-            ax[1,col].plot(time,item_vit,color)
-            ax[2,col].plot(time,item_dis,color) 
-    lines = (lines[0][0],lines[1][0])  
-    fig.legend(lines, ('avec anticipation', 'sans anticipation'), loc='upper right') 
+            Color = line_type[j]+color
+            lines1[i] = ax[0,col].plot(time,item_accX[:1200],Color)
+            lines2[j] = ax[1,col].plot(time,item_vit,Color)
+            ax[2,col].plot(time,item_dis,Color) 
+            j+=1
+    lines1 = (lines1[0][0],lines1[1][0])  
+    lines2 = (lines2[0][0],lines2[1][0],lines2[2][0])  
+    fig.legend(lines1, ('avec anticipation', 'sans anticipation'), loc='upper right') 
+    fig.legend(lines2, ('masse 1', 'masse 2', 'masse 3'), loc='upper right', bbox_to_anchor=(1, 0.95))    
+    fig.savefig("figures\Add\%s_dist.png" %(name)) 
     fig.show()
     
 def Sum():
@@ -153,13 +167,11 @@ def Sum():
     for i in range(12): 
         ind_1,ind_2 = blocks_ind[str(i+1)]
         for j in range(3):
-            for k in ind[str(i+1)][str(j+1)]:
-                if type(k) == int:
-                    k = [k]
-                for l in k:
+            if ind[str(i+1)][str(j+1)] != []:
+                for k in ind[str(i+1)][str(j+1)]: 
                     L = 0 
                     for item_accX,item_GF,item_LF,item_dGF,item_vit,item_dis in zip(accX[ind_1][ind_2],GF[ind_1][ind_2],LF[ind_1][ind_2],dGF[ind_1][ind_2],vit[ind_1][ind_2],dis[ind_1][ind_2]):
-                        if l == L: 
+                        if k == L: 
                             if np.all(new_donnees_accX[ind_1][j]) == None:
                                 new_donnees_accX[ind_1][j] = item_accX
                                 new_donnees_GF[ind_1][j] = item_GF
@@ -198,7 +210,7 @@ def block_order():
     elif name == 'walid':
         first = 3
         Next = 2 
-    elif name == 'victor': # finalement il a commencé avec ou sans anticipation ?
+    elif name == 'victor':  
         first = 1
         Next = 0 
     elif name == 'florent':
@@ -234,7 +246,7 @@ def block_order():
                 ind[block] = {'1':[],'2':[],'3':[]}
                 choc_number[block] = {'1':0,'2':0,'3':0}
                 n = 0    
-            elif not line == "\n":
+            elif not line == "\n": 
                 mass = line.split(' ')[4][0]
                 ind[block][mass].append(n)
                 choc_number[block][mass] += 1
@@ -254,11 +266,13 @@ def block_order():
                         for h in to_cancel[first][j]:
                             if l == h:
                                 choc_number[str((j*2)+1)][k] -= 1 
+                                ind[str((j*2)+1)][k].remove(l)
                 for l in ind[str((j*2)+2)][k]:
                     if to_cancel[Next][j] != []:
                         for h in to_cancel[Next][j]:
                             if l == h:
-                                choc_number[str((j*2)+2)][k] -= 1    
+                                choc_number[str((j*2)+2)][k] -= 1 
+                                ind[str((j*2)+2)][k].remove(l)   
             else:
                 new_first = 0 ; new_next = 0
                 if first < 2:
@@ -272,11 +286,13 @@ def block_order():
                         for h in to_cancel[new_first][j-3]:
                             if l == h:
                                 choc_number[str((j*2)+1)][k] -= 1 
+                                ind[str((j*2)+1)][k].remove(l)
                 for l in ind[str((j*2)+2)][k]:
                     if to_cancel[new_next][j-3] != []:
                         for h in to_cancel[new_next][j-3]:
                             if l == h:
                                 choc_number[str((j*2)+2)][k] -= 1  
+                                ind[str((j*2)+2)][k].remove(l)
     
     new_choc_number = [[0,0,0] for i in range(4)]
     for i in range(12):

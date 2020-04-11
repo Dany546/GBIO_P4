@@ -17,6 +17,7 @@ from integ import integ as Positions
 import glm_data_processing as glm
 import derive as der
 import Add 
+import erreurs
 
 # Fermeture des figures ouvertes
 plt.close('all') 
@@ -25,7 +26,7 @@ donnees_accX = [[],[],[],[]] # haut avec, haut sans, bas avec, bas sans
 donnees_GF = [[],[],[],[]] 
 donnees_LF = [[],[],[],[]]  
 donnees_dGF = [[],[],[],[]] 
-to_cancel = [[],[],[],[]]
+to_cancel = None
 delai = [[],[],[],[]]
 vit = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
 dis = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
@@ -37,6 +38,7 @@ subjects=[path.split('_')[0]+'_'+path.split('_')[1]+'_'+path.split('_')[2] for i
 def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,chock_number=1,Trial=0):
     global donnees_accX, donnees_GF, donnees_LF, donnees_dGF, to_cancel, subjects
     subjects = subjects[beginning:The_end]
+    to_cancel = erreurs.err(Name)
     if zoom and (not add) and (not Delai): 
         subjects = [subjects]         
     for s in subjects:
@@ -69,7 +71,12 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                 accX  = glm_df.loc[:,'LowAcc_X'].to_numpy()*(-9.81)
                 accX  = accX-np.nanmean(accX[baseline])
                 GF    = glm_df.loc[:,'GF'].to_numpy()
-                GF    = GF-np.nanmean(GF[baseline])
+                
+                if name=='victor' and hb=='bas' and  block=='sans' and trial==1:
+                    GF = GF-np.nanmin(GF)
+                else: 
+                    GF = GF-np.nanmean(GF[baseline])
+                    
                 LFv   = TFx_thumb+TFx_index
                 LFh   = TFz_thumb+TFz_index
                 LF    = np.hypot(LFv,LFh)
@@ -79,7 +86,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                 freqFiltAcc=20 #Frequence de coupure de l'acceleration
                 freqFiltForces=20 #Frequence de coupure des forces
                   
-                accX = glm.filter_signal(accX, fs = freqAcq, fc = freqFiltAcc)
+                accX = glm.filter_signal(accX, fs = freqAcq, fc = freqFiltAcc)   
                 GF   = glm.filter_signal(GF,   fs = freqAcq, fc = freqFiltForces)
                 LF   = glm.filter_signal(LF,   fs = freqAcq, fc = freqFiltForces)
                 LFv   = glm.filter_signal(LFv,   fs = freqAcq, fc = freqFiltForces)
@@ -101,7 +108,15 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                 #%% Compute derivative of LF
                 dGF=der.derive(GF,800)
                 dGF=glm.filter_signal(dGF, fs = freqAcq, fc = 10)
-                #%% Basic plot of the data 
+                
+                if (not add) and (not zoom): 
+                    accX = accX[0:ipk[-1]+3200]  
+                    GF   = GF[0:ipk[-1]+3200]
+                    LF   = LF[0:ipk[-1]+3200]
+                    dGF  = dGF[0:ipk[-1]+3200] 
+                    time  = time[0:ipk[-1]+3200] 
+                
+                #%% Basic plot of the data  
                 fig = None ; ax = None
                 if zoom and (not add) and (not Delai):
                     fig = plt.figure(figsize = [3,12]) 
@@ -117,8 +132,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             for st,e in zip(cycle_starts,cycle_ends):
                                 v,d =Positions(accX[st:e],time[st:e])
                                 vit[0][trial-1].append(v) 
-                                dis[0][trial-1].append(d) 
-                            to_cancel[0].append([])  
+                                dis[0][trial-1].append(d)  
                         elif block == 'sans':
                             donnees_accX[1].append([accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_GF[1].append([GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
@@ -128,7 +142,6 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                                 v,d =Positions(accX[st:e],time[st:e])
                                 vit[1][trial-1].append(v) 
                                 dis[1][trial-1].append(d)  
-                            to_cancel[1].append([])    
                     elif hb == 'bas':
                         if block == 'avec':
                             donnees_accX[2].append([accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
@@ -138,8 +151,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             for st,e in zip(cycle_starts,cycle_ends):
                                 v,d =Positions(accX[st:e],time[st:e])
                                 vit[2][trial-1].append(v) 
-                                dis[2][trial-1].append(d) 
-                            to_cancel[2].append([])     
+                                dis[2][trial-1].append(d)  
                         elif block == 'sans':
                             donnees_accX[3].append([accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_GF[3].append([GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
@@ -148,8 +160,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             for st,e in zip(cycle_starts,cycle_ends):
                                 v,d =Positions(accX[st:e],time[st:e])
                                 vit[3][trial-1].append(v) 
-                                dis[3][trial-1].append(d) 
-                            to_cancel[3].append([])    
+                                dis[3][trial-1].append(d)  
                 else:    
                     ax  = fig.subplots(3,1) 
                     
@@ -174,11 +185,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                         ax[1].set_xlim([start,end])
                         ax[2].set_xlim([start,end])
                         mini = accX[ipk[chock_number-1]]
-                        ax[0].set_ylim([mini-2,-mini]) 
-                    else:
-                        ax[0].set_xlim([0,time[ipk[-1]+3200]])
-                        ax[1].set_xlim([0,time[ipk[-1]+3200]])
-                        ax[2].set_xlim([0,time[ipk[-1]+3200]]) 
+                        ax[0].set_ylim([mini-2,-mini])  
                     
                 if (not zoom) and (not add) and (not Delai):
                     # Putting grey patches for cycles

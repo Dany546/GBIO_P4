@@ -30,23 +30,23 @@ import gbio_example_script_collisions_dany as gbio
 # il faut modifier ces variables pour dire quoi faire (add prévaut sur Delai qui prévaut sur zoom)
 
 # mettre que les sujets dont on veut les plots
-name = 'walid' # put the subjects' names in here
+name = 'alex' # put the subjects' names in here
 
-# mettre True pour faire les moyennes sur les masses et superposer les courbes
-Add = True #False
+# mettre True  pour faire les moyennes sur les masses et superposer les courbes
+Add = True  
 
 # mettre True pour calculer les décalages moyen entre grip force avec et grip force sans  
-delai = True
+delai = False
 
 # mettre True pour zoomer sur un choc en particulier
 zoom = False 
-chock = 'alex_haut_sans_001', 1 # choc sur lequel zoomer: bloc, choc    
+chock = 'victor_bas_sans_001', 1 # choc sur lequel zoomer: bloc, choc    
 
 # a changer que si on veut plot les graphes de base pour un bloc en particulier 
 # dans ce cas, il ne faut pas oublier de mettre False pour add, Delai et zoom   
 
-bloc = 'all' # sinon: bloc = 'alex_haut_sans' et trial = 1 correspond au fichier alex_haut_sans_001  
-trial = 0    # 0 est la valeur par defaut
+bloc = 'victor_bas_sans' # sinon: bloc = 'alex_haut_sans' et trial = 1 correspond au fichier alex_haut_sans_001  
+trial = 1    # 0 est la valeur par defaut
 
 # ça sert à rien de toucher à ça, 
 # c'est juste pour initialiser les variables 
@@ -54,8 +54,7 @@ trial = 0    # 0 est la valeur par defaut
 start = 0
 end = 0
 
-#%% pour avoir les plots superposes ou calculer le decalage
-
+#%% pour avoir les plots superposes ou calculer le decalage 
 if Add or delai: 
     
     if name == 'alex':

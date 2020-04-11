@@ -94,11 +94,37 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                 
                 #%% CUTTING THE TASK INTO SEGMENTS (your first task)
                 pk = signal.find_peaks(abs(accX),prominence=4.5,distance=2000) # avant:prominence=9,distance=1000
-                ipk = pk[0][0:10]
+                ipk = pk[0] 
+                 
+                if name=='victor' and hb=='haut' and block=='avec' and trial==1:
+                    ip = [-1 if ii == 4 else ipk[ii] for ii in range(5)]
+                    ipk = np.append(ip,ipk[4:])
+                elif name=='victor' and hb=='bas' and block=='sans' and trial==1: 
+                    ipk = np.append([-1],ipk) 
+                elif name=='alex' and hb=='bas' and block=='sans' and trial==1:
+                    ip = [-1 if ii == 2 else ipk[ii] for ii in range(3)]
+                    ipk = np.append(ip,ipk[2:]) 
+                elif name=='alex' and hb=='haut' and block=='avec' and trial==2:
+                    ip = [-1 if ii == 6 else ipk[ii] for ii in range(7)]
+                    ipk = np.append(ip,ipk[6:])  
+                elif name=='florent' and hb=='bas' and block=='avec' and trial==1:
+                    ip = [-1 if ii == 1 else ipk[ii] for ii in range(2)]
+                    ipk = np.append(ip,ipk[1:])  
+                elif name=='florent' and hb=='haut' and block=='avec' and trial==2:
+                    ip = [-1 if ii == 6 else ipk[ii] for ii in range(7)]
+                    ipk = np.append(ip,ipk[6:])  
+                elif name=='florent' and hb=='bas' and block=='sans' and trial==1:
+                    ip = [-1 if ii == 7 else ipk[ii] for ii in range(8)]
+                    ipk = np.append(ip,ipk[7:])  
+                elif name=='florent' and hb=='haut' and block=='sans' and trial==3:
+                    ip = [-1 if ii == 4 else ipk[ii] for ii in range(5)]
+                    ipk = np.append(ip,ipk[4:])  
+                        
+                if len(ipk)>10:
+                    ipk = ipk[:10]  
                 
-                if ipk[-1]-ipk[-2]>9000*0.8:
-                    ipk = ipk[:9] 
-                     
+                bk = np.zeros(1200)    
+                         
                 cycle_starts = ipk-400  # 1 seconde = 800 
                 cycle_ends = ipk+800
                 
@@ -125,42 +151,58 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                 if add or Delai:  
                     if hb == 'haut': 
                         if block == 'avec':
-                            donnees_accX[0].append([accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_GF[0].append([GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_LF[0].append([LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_dGF[0].append([dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+                            donnees_accX[0].append([bk if st<0 else accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_GF[0].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_LF[0].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_dGF[0].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
                             for st,e in zip(cycle_starts,cycle_ends):
-                                v,d =Positions(accX[st:e],time[st:e])
-                                vit[0][trial-1].append(v) 
-                                dis[0][trial-1].append(d)  
+                                if st<0: 
+                                    vit[0][trial-1].append(bk) 
+                                    dis[0][trial-1].append(bk) 
+                                else: 
+                                    v,d =Positions(accX[st:e],time[st:e])
+                                    vit[0][trial-1].append(v) 
+                                    dis[0][trial-1].append(d)  
                         elif block == 'sans':
-                            donnees_accX[1].append([accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_GF[1].append([GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_LF[1].append([LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_dGF[1].append([dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+                            donnees_accX[1].append([bk if st<0 else accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_GF[1].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_LF[1].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_dGF[1].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
                             for st,e in zip(cycle_starts,cycle_ends):
-                                v,d =Positions(accX[st:e],time[st:e])
-                                vit[1][trial-1].append(v) 
-                                dis[1][trial-1].append(d)  
+                                if st<0: 
+                                    vit[1][trial-1].append(bk) 
+                                    dis[1][trial-1].append(bk) 
+                                else: 
+                                    v,d =Positions(accX[st:e],time[st:e])
+                                    vit[1][trial-1].append(v) 
+                                    dis[1][trial-1].append(d)  
                     elif hb == 'bas':
                         if block == 'avec':
-                            donnees_accX[2].append([accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_GF[2].append([GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_LF[2].append([LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_dGF[2].append([dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_accX[2].append([bk if st<0 else accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_GF[2].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_LF[2].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_dGF[2].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             for st,e in zip(cycle_starts,cycle_ends):
-                                v,d =Positions(accX[st:e],time[st:e])
-                                vit[2][trial-1].append(v) 
-                                dis[2][trial-1].append(d)  
+                                if st<0: 
+                                    vit[2][trial-1].append(bk) 
+                                    dis[2][trial-1].append(bk) 
+                                else: 
+                                    v,d =Positions(accX[st:e],time[st:e])
+                                    vit[2][trial-1].append(v) 
+                                    dis[2][trial-1].append(d)  
                         elif block == 'sans':
-                            donnees_accX[3].append([accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_GF[3].append([GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_LF[3].append([LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_dGF[3].append([dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+                            donnees_accX[3].append([bk if st<0 else accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_GF[3].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_LF[3].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_dGF[3].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
                             for st,e in zip(cycle_starts,cycle_ends):
-                                v,d =Positions(accX[st:e],time[st:e])
-                                vit[3][trial-1].append(v) 
-                                dis[3][trial-1].append(d)  
+                                if st<0:  
+                                    vit[3][trial-1].append(bk) 
+                                    dis[3][trial-1].append(bk)  
+                                else: 
+                                    v,d =Positions(accX[st:e],time[st:e])
+                                    vit[3][trial-1].append(v) 
+                                    dis[3][trial-1].append(d)  
                 else:    
                     ax  = fig.subplots(3,1) 
                     

@@ -18,19 +18,145 @@ dGF = None
 vit = None
 dis = None
 SF = None
-SM = None
+SM = None 
+ipk_A = None
+ipk_G = None
 
-def delai(Name):
-    global accX, GF, LF, dGF, name, to_cancel  
-    
-    name = Name 
+def delai(Name,Type): 
+    global accX, GF, LF, dGF, name, to_cancel, vit, dis, SF, SM
+         
+    name = Name  
     to_cancel = gbio.to_cancel 
     accX = gbio.donnees_accX
     GF = gbio.donnees_GF
     LF = gbio.donnees_LF
     dGF = gbio.donnees_dGF
+    vit = gbio.vit
+    dis = gbio.dis
+    SF = gbio.donnees_SF
+    SM = gbio.donnees_SM  
+    ipk_A = gbio.Ipk_A   
+    ipk_G = gbio.Ipk_G   
     
-    new_accX,new_GF,new_LF,new_dGF,new_vit,new_dis = Sum()
+#    new_delai_dic = {}
+#    names = ['']
+#    
+#    new = [None for i in range(10)]            
+#    new_delai = [[new,new,new],[new,new,new],[new,new,new],[new,new,new]] 
+#    
+#    A = 0   
+#    G = 0   
+#            
+#    for i in range(4):
+#        for j in range(3):
+#            l=0
+#            for a,p in zip(ipk_A[i][j],ipk_G[i][j]):
+#                if a!=-1: 
+#                    for k in range(400):
+#                        if accX[i][j][l][a-k]==0:
+#                            A = a-k         
+#                        if dGF[i][j][l][p-k]==0:
+#                            G = p-k 
+#                new_delai[i][j][l] = (G-A)*5/4     
+#                l+=1
+#                
+#    new_delai_dic[name] = new_delai    
+#     
+#    if Type=='all': 
+#        names = ['alex','walid','victor','florent']
+#    else:
+#        names = [name]
+#               
+#    for the_name in names:
+#        if not name==the_name:
+#            start = 0 ; end = 0
+#            if the_name == 'alex':
+#                start = 0 ; end = 4
+#            elif the_name == 'florent': 
+#                start = 4 ; end = 8 
+#            elif the_name == 'victor': 
+#                start = 8 ; end = 12
+#            elif the_name == 'walid': 
+#                start = 12 ; end = 16  
+#            _,_,_,_,_,_,tG,_,_,iA,iG = gbio.make_plots(start,end,Delai=True,noreturn=False) 
+#            to_cancel = tG 
+#            ipk_A = iA   
+#            ipk_G = iG  
+#            
+#            A = 0   
+#            G = 0   
+#            
+#            new = [None for i in range(10)]            
+#            new_delai = [[new,new,new],[new,new,new],[new,new,new],[new,new,new]] 
+#            
+#            for i in range(4):
+#                for j in range(3):
+#                    l=0
+#                    for a,p in zip(ipk_A[i][j],ipk_G[i][j]):
+#                        if a!=-1: 
+#                            for k in range(400):
+#                                if accX[i][j][l][a-k]==0:
+#                                    A = a-k         
+#                                if dGF[i][j][l][p-k]==0:
+#                                    G = p-k 
+#                        new_delai[i][j][l] = (G-A)*5/4     
+#                        l+=1
+#                        
+#            new_delai_dic[the_name] = new_delai            
+#    
+#    name_2 = name 
+#    if Type=='all': 
+#        name_2 = 'Moyenne generale'
+#        
+#    new_file = None
+#    try:     
+#        new_file = open("decalage\%s_détails" %(name_2),"w")
+#        blocs = ['haut avec','haut sans','bas avec','bas sans'] 
+#        for key,value in new_delai_dic.items():
+#            new_file.write(key+':')
+#            new_file.write('\n')
+#            for i in range(4):  
+#                for j in range(3): 
+#                    new_file.write('\t'+blocs[i]+'_00%d:\n'%(j+1))
+#                    new_file.write('\n')
+#                    for k,dec in enumerate(value[i][j]):
+#                        new_file.write('\t \t décalage choc %d:\t '%(k+1))
+#                        new_file.write(str(dec)+'\t [ms]')
+#                        new_file.write('\n')    
+#                new_file.write('\n') 
+#        new_file.close()                
+#    except Exception:
+#        raise                  
+#    finally:
+#        if new_file != None:
+#            new_file.close()
+            
+    _,new_GF,_,_,_,_,_,_ = Sum() 
+    
+    if Type=='all': 
+        new_GF = new_GF/4
+        for the_name in ['alex','walid','victor','florent']:
+            if not name==the_name:
+                start = 0 ; end = 0
+                if the_name == 'alex':
+                    start = 0 ; end = 4
+                elif the_name == 'florent': 
+                    start = 4 ; end = 8 
+                elif the_name == 'victor': 
+                    start = 8 ; end = 12
+                elif the_name == 'walid': 
+                    start = 12 ; end = 16  
+                _,B,_,_,_,_,G,_,_,_,_ = gbio.make_plots(start,end,Name=the_name,Delai=True,noreturn=False) 
+                to_cancel = G 
+                GF = B 
+                name = the_name
+                _,new_GF_2,_,_,_,_,_,_ = Sum()  
+                for mmmh,item in enumerate(new_GF_2):
+                    new_GF[mmmh][0] = new_GF[mmmh][0] + item[0]/4
+                    new_GF[mmmh][1] = new_GF[mmmh][1] + item[1]/4
+                    new_GF[mmmh][2] = new_GF[mmmh][2] + item[2]/4   
+                    
+        name = 'Moyenne générale' 
         
     new_delai = [[None,None,None],[None,None,None]] 
       
@@ -39,6 +165,7 @@ def delai(Name):
             new_delai[i][j] = decal(new_GF[i*2][j],new_GF[(i*2)+1][j])
     
     # écris tout dans un fichier texte   
+    new_file = None
     try:     
         new_file = open("decalage\%s" %(name),"w")
         blocs = ['haut','bas']  
@@ -47,7 +174,7 @@ def delai(Name):
             for j in range(3): 
                 new_file.write('\t décalage moyen masse %d:\t ' %(j+1))
                 for dec in new_delai[i][j]:
-                    new_file.write(str(dec)+'\t')
+                    new_file.write(str(dec)+'\t [ms]')
                 new_file.write('\n')    
             new_file.write('\n') 
         new_file.close()                
@@ -60,8 +187,8 @@ def delai(Name):
 # calcule le decalage entre deux signaux en milisecondes
 def decal(signal_1,signal_2):
     
-    pk_1 = peaks(signal_1,prominence=9,distance=400) 
-    pk_2 = peaks(signal_2,prominence=9,distance=400) 
+    pk_1 = peaks(signal_1,prominence=10,distance=800) 
+    pk_2 = peaks(signal_2,prominence=10,distance=800)  
     
     return abs(pk_1[0]-pk_2[0])*5/4   # 1000/800 = 5/4 
     
@@ -80,19 +207,28 @@ def superpose(Name,Type):
     SM = gbio.donnees_SM
     
     new_accX,new_GF,new_LF,new_dGF,new_vit,new_dis,new_SF,new_SM = Sum()
-    time = np.arange(0,1200*5/4,5/4)
     
     if Type=='all': 
+        for i in range(4):
+            for j in range(3): 
+                new_accX[i][j] = new_accX[i][j]/4
+                new_GF[i][j] = new_GF[i][j]/4
+                new_LF[i][j] = new_LF[i][j]/4                 
+                new_dGF[i][j] = new_dGF[i][j]/4
+                new_vit[i][j] = new_vit[i][j]/4
+                new_dis[i][j] = new_dis[i][j]/4
+                new_SF[i][j] = new_SF[i][j]/4
+                new_SM[i][j] = new_SM[i][j]/4
         for the_name in ['alex','walid','victor','florent']:
             if not name==the_name:
                 start = 0 ; end = 0
-                if name == 'alex':
+                if the_name == 'alex':
                     start = 0 ; end = 4
-                elif name == 'florent': 
+                elif the_name == 'florent': 
                     start = 4 ; end = 8 
-                elif name == 'victor': 
+                elif the_name == 'victor': 
                     start = 8 ; end = 12
-                elif name == 'walid': 
+                elif the_name == 'walid': 
                     start = 12 ; end = 16  
                 A,B,C,D,E,F,G,H,I = gbio.make_plots(start,end,Name=the_name,add=True,noreturn=False)
                 to_cancel = G
@@ -107,38 +243,41 @@ def superpose(Name,Type):
                 name = the_name
                 new_accX_2,new_GF_2,new_LF_2,new_dGF_2,new_vit_2,new_dis_2,new_SF_2,new_SM_2 = Sum()
                 for mmmh,item in enumerate(new_accX_2):
-                    new_accX[mmmh][0] = new_accX[mmmh][0]/4 + item[0]/4
-                    new_accX[mmmh][1] = new_accX[mmmh][1]/4 + item[1]/4
-                    new_accX[mmmh][2] = new_accX[mmmh][2]/4 + item[2]/4
+                    new_accX[mmmh][0] = new_accX[mmmh][0] + item[0]/4
+                    new_accX[mmmh][1] = new_accX[mmmh][1] + item[1]/4
+                    new_accX[mmmh][2] = new_accX[mmmh][2] + item[2]/4
                 for mmmh,item in enumerate(new_GF_2):
-                    new_GF[mmmh][0] = new_GF[mmmh][0]/4 + item[0]/4
-                    new_GF[mmmh][1] = new_GF[mmmh][1]/4 + item[1]/4
-                    new_GF[mmmh][2] = new_GF[mmmh][2]/4 + item[2]/4
+                    new_GF[mmmh][0] = new_GF[mmmh][0] + item[0]/4
+                    new_GF[mmmh][1] = new_GF[mmmh][1] + item[1]/4
+                    new_GF[mmmh][2] = new_GF[mmmh][2] + item[2]/4
                 for mmmh,item in enumerate(new_LF_2):
-                    new_LF[mmmh][0] = new_LF[mmmh][0]/4 + item[0]/4
-                    new_LF[mmmh][1] = new_LF[mmmh][1]/4 + item[1]/4
-                    new_LF[mmmh][2] = new_LF[mmmh][2]/4 + item[2]/4
+                    new_LF[mmmh][0] = new_LF[mmmh][0] + item[0]/4
+                    new_LF[mmmh][1] = new_LF[mmmh][1] + item[1]/4
+                    new_LF[mmmh][2] = new_LF[mmmh][2] + item[2]/4
                 for mmmh,item in enumerate(new_dGF_2):
-                    new_dGF[mmmh][0] = new_dGF[mmmh][0]/4 + item[0]/4
-                    new_dGF[mmmh][1] = new_dGF[mmmh][1]/4 + item[1]/4
-                    new_dGF[mmmh][2] = new_dGF[mmmh][2]/4 + item[2]/4 
+                    new_dGF[mmmh][0] = new_dGF[mmmh][0] + item[0]/4
+                    new_dGF[mmmh][1] = new_dGF[mmmh][1] + item[1]/4
+                    new_dGF[mmmh][2] = new_dGF[mmmh][2] + item[2]/4 
                 for mmmh,item in enumerate(new_vit_2):
-                    new_vit[mmmh][0] = new_vit[mmmh][0]/4 + item[0]/4
-                    new_vit[mmmh][1] = new_vit[mmmh][1]/4 + item[1]/4
-                    new_vit[mmmh][2] = new_vit[mmmh][2]/4 + item[2]/4  
+                    new_vit[mmmh][0] = new_vit[mmmh][0] + item[0]/4
+                    new_vit[mmmh][1] = new_vit[mmmh][1] + item[1]/4
+                    new_vit[mmmh][2] = new_vit[mmmh][2] + item[2]/4  
                 for mmmh,item in enumerate(new_dis_2):
-                    new_dis[mmmh][0] = new_dis[mmmh][0]/4 + item[0]/4
-                    new_dis[mmmh][1] = new_dis[mmmh][1]/4 + item[1]/4
-                    new_dis[mmmh][2] = new_dis[mmmh][2]/4 + item[2]/4  
+                    new_dis[mmmh][0] = new_dis[mmmh][0] + item[0]/4
+                    new_dis[mmmh][1] = new_dis[mmmh][1] + item[1]/4
+                    new_dis[mmmh][2] = new_dis[mmmh][2] + item[2]/4  
                 for mmmh,item in enumerate(new_SF_2):
-                    new_SF[mmmh][0] = new_SF[mmmh][0]/4 + item[0]/4
-                    new_SF[mmmh][1] = new_SF[mmmh][1]/4 + item[1]/4
-                    new_SF[mmmh][2] = new_SF[mmmh][2]/4 + item[2]/4  
+                    new_SF[mmmh][0] = new_SF[mmmh][0] + item[0]/4
+                    new_SF[mmmh][1] = new_SF[mmmh][1] + item[1]/4
+                    new_SF[mmmh][2] = new_SF[mmmh][2] + item[2]/4  
                 for mmmh,item in enumerate(new_SM_2):
-                    new_SM[mmmh][0] = new_SM[mmmh][0]/4 + item[0]/4
-                    new_SM[mmmh][1] = new_SM[mmmh][1]/4 + item[1]/4
-                    new_SM[mmmh][2] = new_SM[mmmh][2]/4 + item[2]/4   
+                    new_SM[mmmh][0] = new_SM[mmmh][0] + item[0]/4
+                    new_SM[mmmh][1] = new_SM[mmmh][1] + item[1]/4
+                    new_SM[mmmh][2] = new_SM[mmmh][2] + item[2]/4   
+                    
         name = 'Moyenne générale'        
+    
+    time = np.arange(0,1200*5/4,5/4)
     
     fig = plt.figure(figsize = [8,10])
     ax  = fig.subplots(4,2)
@@ -255,14 +394,14 @@ def superpose(Name,Type):
 def Sum():
     global accX, GF, LF, dGF, to_cancel, vit, dis, name, SF, SM
     
-    new_donnees_accX = [[None,None,None] for i in range(4)] 
-    new_donnees_GF = [[None,None,None] for i in range(4)]   
-    new_donnees_LF = [[None,None,None] for i in range(4)]   
-    new_donnees_dGF = [[None,None,None] for i in range(4)]  
-    new_vit = [[None,None,None] for i in range(4)]    
-    new_dis = [[None,None,None] for i in range(4)]   
-    new_SF = [[None,None,None] for i in range(4)]    
-    new_SM = [[None,None,None] for i in range(4)]   
+    new_donnees_accX = np.array([np.array([None,None,None]) for i in range(4)]) 
+    new_donnees_GF = np.array([np.array([None,None,None]) for i in range(4)])   
+    new_donnees_LF = np.array([np.array([None,None,None]) for i in range(4)])
+    new_donnees_dGF = np.array([np.array([None,None,None]) for i in range(4)])
+    new_vit = np.array([np.array([None,None,None]) for i in range(4)])
+    new_dis = np.array([np.array([None,None,None]) for i in range(4)])
+    new_SF = np.array([np.array([None,None,None]) for i in range(4)])
+    new_SM = np.array([np.array([None,None,None]) for i in range(4)])
     
     # somme sur chaque masse pour les 3 memes blocs
     ind,blocks_ind,choc_number = block_order() 

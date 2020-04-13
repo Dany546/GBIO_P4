@@ -28,14 +28,15 @@ donnees_LF = [[],[],[],[]]
 donnees_dGF = [[],[],[],[]] 
 donnees_SF = [[],[],[],[]] 
 donnees_SM = [[],[],[],[]] 
-to_cancel = None
-delai = [[],[],[],[]]
+to_cancel = None 
+Ipk_A = [[],[],[],[]] 
+Ipk_G = [[],[],[],[]] 
 vit = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
 dis = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]] 
   
 # Double for-loop that runs through all subjects and trials 
 def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,chock_number=1,Trial=0,Type='',noreturn=True):
-    global donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM  
+    global donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM, Ipk_A, Ipk_G  
     file=os.listdir("mesures") 
     subjects=[path.split('_')[0]+'_'+path.split('_')[1]+'_'+path.split('_')[2] for i,path in enumerate(file) if i%3 == 0] 
     donnees_accX = [[],[],[],[]] # haut avec, haut sans, bas avec, bas sans
@@ -44,7 +45,8 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
     donnees_dGF = [[],[],[],[]]  
     donnees_SF = [[],[],[],[]] 
     donnees_SM = [[],[],[],[]] 
-    delai = [[],[],[],[]]
+    Ipk_A = [[],[],[],[]] 
+    Ipk_G = [[],[],[],[]]  
     vit = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
     dis = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]] 
     subjects = subjects[beginning:The_end]
@@ -101,49 +103,71 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                 LF   = glm.filter_signal(LF,   fs = freqAcq, fc = freqFiltForces)
                 LFv   = glm.filter_signal(LFv,   fs = freqAcq, fc = freqFiltForces)
                 LFh   = glm.filter_signal(LFh,   fs = freqAcq, fc = freqFiltForces)
+                       
+                #%% Compute derivative of LF
+                dGF=der.derive(GF,800)
+                dGF=glm.filter_signal(dGF, fs = freqAcq, fc = 10) 
                 
                 #%% CUTTING THE TASK INTO SEGMENTS (your first task)
                 pk = signal.find_peaks(abs(accX),prominence=4.5,distance=2000) # avant:prominence=9,distance=1000
                 ipk = pk[0] 
+                
+                pkg = signal.find_peaks(abs(dGF),prominence=20,distance=2000) # avant:prominence=9,distance=1000
+                ipkg = pkg[0] 
                  
                 if name=='victor' and hb=='haut' and block=='avec' and trial==1:
                     ip = [-1 if ii == 4 else ipk[ii] for ii in range(5)]
+                    ipg = [-1 if ii == 4 else ipkg[ii] for ii in range(5)]
                     ipk = np.append(ip,ipk[4:])
+                    ipkg = np.append(ipg,ipkg[4:])
                 elif name=='victor' and hb=='bas' and block=='sans' and trial==1: 
                     ipk = np.append([-1],ipk) 
+                    ipkg = np.append([-1],ipkg) 
                 elif name=='alex' and hb=='bas' and block=='sans' and trial==1:
                     ip = [-1 if ii == 2 else ipk[ii] for ii in range(3)]
+                    ipg = [-1 if ii == 2 else ipkg[ii] for ii in range(3)]
                     ipk = np.append(ip,ipk[2:]) 
+                    ipkg = np.append(ipg,ipkg[2:]) 
                 elif name=='alex' and hb=='haut' and block=='avec' and trial==2:
                     ip = [-1 if ii == 6 else ipk[ii] for ii in range(7)]
+                    ipg = [-1 if ii == 6 else ipkg[ii] for ii in range(7)]
                     ipk = np.append(ip,ipk[6:])  
+                    ipkg = np.append(ipg,ipkg[6:]) 
                 elif name=='florent' and hb=='bas' and block=='avec' and trial==1:
                     ip = [-1 if ii == 1 else ipk[ii] for ii in range(2)]
+                    ipg = [-1 if ii == 1 else ipkg[ii] for ii in range(2)]
                     ipk = np.append(ip,ipk[1:])  
+                    ipkg = np.append(ipg,ipkg[1:]) 
                 elif name=='florent' and hb=='haut' and block=='avec' and trial==2:
                     ip = [-1 if ii == 6 else ipk[ii] for ii in range(7)]
+                    ipg = [-1 if ii == 6 else ipkg[ii] for ii in range(7)]
                     ipk = np.append(ip,ipk[6:])  
+                    ipkg = np.append(ipg,ipkg[6:]) 
                 elif name=='florent' and hb=='bas' and block=='sans' and trial==1:
                     ip = [-1 if ii == 7 else ipk[ii] for ii in range(8)]
+                    ipg = [-1 if ii == 7 else ipkg[ii] for ii in range(8)]
                     ipk = np.append(ip,ipk[7:])  
+                    ipkg = np.append(ipg,ipkg[7:]) 
                 elif name=='florent' and hb=='haut' and block=='sans' and trial==3:
                     ip = [-1 if ii == 4 else ipk[ii] for ii in range(5)]
+                    ipg = [-1 if ii == 4 else ipkg[ii] for ii in range(5)]
                     ipk = np.append(ip,ipk[4:])  
+                    ipkg = np.append(ipg,ipkg[4:]) 
                         
                 if len(ipk)>10:
                     ipk = ipk[:10]  
+                    ipkg = ipkg[:10]  
                 
                 bk = np.zeros(1200)    
                          
                 cycle_starts = ipk-400  # 1 seconde = 800 
                 cycle_ends = ipk+800
                 
+                cycle_starts_G = ipkg-400  # 1 seconde = 800 
+                cycle_ends_G = ipkg+800
+                
                 start = time[cycle_starts[chock_number-1]] 
                 end = time[cycle_ends[chock_number-1]] 
-                       
-                #%% Compute derivative of LF
-                dGF=der.derive(GF,800)
-                dGF=glm.filter_signal(dGF, fs = freqAcq, fc = 10)
                 
                 if (not add) and (not zoom): 
                     accX = accX[0:ipk[-1]+3200]  
@@ -151,7 +175,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                     LF   = LF[0:ipk[-1]+3200]
                     dGF  = dGF[0:ipk[-1]+3200] 
                     time  = time[0:ipk[-1]+3200] 
-                    
+                
                 #%%   alexandre était ici :)  
                     
                 #%% Autre façon de prendre les n et k: mu plus petit index/pouce et avant/après cfr DifferentsNetK.py
@@ -195,7 +219,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                 
                 #%% Basic plot of the data  
                 fig = None ; ax = None
-                if zoom and (not add) and (not Delai) and (not Marge):
+                if zoom and (not add) and (not Delai):
                     fig = plt.figure(figsize = [3,12]) 
                 elif (not add) and (not Delai):
                     fig = plt.figure(figsize = [15,7])
@@ -207,7 +231,9 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             donnees_LF[0].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_dGF[0].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
                             donnees_SF[0].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
-                            donnees_SM[0].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+                            donnees_SM[0].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            Ipk_A[0].append([ipk[st]-e for st,e in enumerate(cycle_starts)])  
+                            Ipk_G[0].append([ipkg[st]-e for st,e in enumerate(cycle_starts_G)])  
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0: 
                                     vit[0][trial-1].append(bk) 
@@ -222,7 +248,9 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             donnees_LF[1].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_dGF[1].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_SF[1].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
-                            donnees_SM[1].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+                            donnees_SM[1].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)])
+                            Ipk_A[1].append([ipk[st]-e for st,e in enumerate(cycle_starts)])  
+                            Ipk_G[1].append([ipkg[st]-e for st,e in enumerate(cycle_starts_G)])  
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0: 
                                     vit[1][trial-1].append(bk) 
@@ -238,7 +266,9 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             donnees_LF[2].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_dGF[2].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_SF[2].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
-                            donnees_SM[2].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_SM[2].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)])
+                            Ipk_A[2].append([ipk[st]-e for st,e in enumerate(cycle_starts)])  
+                            Ipk_G[2].append([ipkg[st]-e for st,e in enumerate(cycle_starts_G)])  
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0: 
                                     vit[2][trial-1].append(bk) 
@@ -254,6 +284,8 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             donnees_dGF[3].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
                             donnees_SF[3].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
                             donnees_SM[3].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            Ipk_A[3].append([ipk[st]-e for st,e in enumerate(cycle_starts)])  
+                            Ipk_G[3].append([ipkg[st]-e for st,e in enumerate(cycle_starts_G)])  
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0:  
                                     vit[3][trial-1].append(bk) 
@@ -307,6 +339,9 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
     if add and noreturn:
         Add.superpose(Name,Type)
     elif add:
-        return donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM      
+        return donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM       
+    elif Delai and noreturn:
+        Add.delai(Name,Type)  
     elif Delai:
-        Add.delai(Name)                                        
+        return donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM, Ipk_A, Ipk_G      
+                                          

@@ -34,10 +34,10 @@ name = 'victor' # put the subjects' names in here
 ttype = 'all' # sinon n'importe quel autre string
 
 # mettre True  pour faire les moyennes sur les masses et superposer les courbes
-Add = True  
+Add = False  
 
 # mettre True pour calculer les décalages moyen entre grip force avec et grip force sans  
-delai = False 
+delai = True 
 
 # mettre True pour zoomer sur un choc en particulier
 zoom = False 

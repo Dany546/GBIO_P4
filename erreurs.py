@@ -22,11 +22,11 @@ def err(Name):
         ba[2] = [0,3,5] 
         bs[0] = [3]
         bs[1] = [9]
-    elif Name == 'victor':
+    elif Name == 'victor': 
         ha[0] = [4]
         ha[1] = [7]
         hs[1] = [2]
-        bs[0] = [0]
+        bs[0] = [0,1,2,3,4,5,6,7,8,9]
         bs[2] = [3]
         ba[0] = [1,7,8]
     elif Name == 'florent':     

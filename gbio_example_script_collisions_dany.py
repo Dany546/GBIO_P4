@@ -26,17 +26,27 @@ donnees_accX = [[],[],[],[]] # haut avec, haut sans, bas avec, bas sans
 donnees_GF = [[],[],[],[]] 
 donnees_LF = [[],[],[],[]]  
 donnees_dGF = [[],[],[],[]] 
+donnees_SF = [[],[],[],[]] 
+donnees_SM = [[],[],[],[]] 
 to_cancel = None
 delai = [[],[],[],[]]
 vit = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
-dis = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
-
-file=os.listdir("mesures") 
-subjects=[path.split('_')[0]+'_'+path.split('_')[1]+'_'+path.split('_')[2] for i,path in enumerate(file) if i%3 == 0] 
+dis = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]] 
   
 # Double for-loop that runs through all subjects and trials 
-def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,chock_number=1,Trial=0):
-    global donnees_accX, donnees_GF, donnees_LF, donnees_dGF, to_cancel, subjects
+def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,chock_number=1,Trial=0,Type='',noreturn=True):
+    global donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM  
+    file=os.listdir("mesures") 
+    subjects=[path.split('_')[0]+'_'+path.split('_')[1]+'_'+path.split('_')[2] for i,path in enumerate(file) if i%3 == 0] 
+    donnees_accX = [[],[],[],[]] # haut avec, haut sans, bas avec, bas sans
+    donnees_GF = [[],[],[],[]] 
+    donnees_LF = [[],[],[],[]]  
+    donnees_dGF = [[],[],[],[]]  
+    donnees_SF = [[],[],[],[]] 
+    donnees_SM = [[],[],[],[]] 
+    delai = [[],[],[],[]]
+    vit = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
+    dis = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]] 
     subjects = subjects[beginning:The_end]
     to_cancel = erreurs.err(Name)
     if zoom and (not add) and (not Delai): 
@@ -141,10 +151,51 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                     LF   = LF[0:ipk[-1]+3200]
                     dGF  = dGF[0:ipk[-1]+3200] 
                     time  = time[0:ipk[-1]+3200] 
+                    
+                #%%   alexandre était ici :)  
+                    
+                #%% Autre façon de prendre les n et k: mu plus petit index/pouce et avant/après cfr DifferentsNetK.py
+                N_PAlex=[0.6421595151481689]
+                K_PAlex=[1.8866959417752258]
+                N_CoeffAlex=N_PAlex[0]
+                K_CoeffAlex=K_PAlex[0]
+                
+                K_PFlo=[1.6567930102080082]
+                N_PFlo=[0.7402058639164167]
+                N_CoeffFlo=N_PFlo[0]
+                K_CoeffFlo=K_PFlo[0]
+                
+                N_PVictor=[0.6208810163847297]
+                K_PVictor=[1.4583906664027992]
+                N_CoeffVictor=N_PVictor[0]
+                K_CoeffVictor=K_PVictor[0]
+                
+                N_PWalid=[0.6333643033817357]
+                K_PWalid=[1.3488218066303728]
+                N_CoeffWalid=N_PWalid[0]
+                K_CoeffWalid=K_PWalid[0]
+ 
+                #%%    SF et SM 
+                #Calcule de la slip force en fonction des coefficients de chacun
+                if s[0]=="a":
+                    SF=pow(LF/2*K_CoeffAlex,1/N_CoeffAlex) 
+                    
+                if s[0]=="f":
+                    SF=pow(LF/2*K_CoeffFlo,1/N_CoeffFlo) 
+                
+                if s[0]=="v":
+                    SF=pow(LF/2*K_CoeffVictor,1/N_CoeffVictor) 
+                
+                if s[0]=="w":
+                    SF=pow(LF/2*K_CoeffWalid,1/N_CoeffWalid) 
+            
+                SM=GF-SF
+                
+                #%% alexandre est parti :( 
                 
                 #%% Basic plot of the data  
                 fig = None ; ax = None
-                if zoom and (not add) and (not Delai):
+                if zoom and (not add) and (not Delai) and (not Marge):
                     fig = plt.figure(figsize = [3,12]) 
                 elif (not add) and (not Delai):
                     fig = plt.figure(figsize = [15,7])
@@ -154,7 +205,9 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             donnees_accX[0].append([bk if st<0 else accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_GF[0].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[0].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_dGF[0].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+                            donnees_dGF[0].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
+                            donnees_SF[0].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
+                            donnees_SM[0].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0: 
                                     vit[0][trial-1].append(bk) 
@@ -167,7 +220,9 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             donnees_accX[1].append([bk if st<0 else accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_GF[1].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[1].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_dGF[1].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+                            donnees_dGF[1].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_SF[1].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
+                            donnees_SM[1].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0: 
                                     vit[1][trial-1].append(bk) 
@@ -182,6 +237,8 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             donnees_GF[2].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[2].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_dGF[2].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+                            donnees_SF[2].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
+                            donnees_SM[2].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0: 
                                     vit[2][trial-1].append(bk) 
@@ -195,6 +252,8 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                             donnees_GF[3].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[3].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_dGF[3].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+                            donnees_SF[3].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
+                            donnees_SM[3].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0:  
                                     vit[3][trial-1].append(bk) 
@@ -245,7 +304,9 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                     
                     fig.savefig("figures\%s_%d_acc_forces_dGF.png" %(s,trial)) 
                     
-    if add:
-        Add.superpose(Name)
+    if add and noreturn:
+        Add.superpose(Name,Type)
+    elif add:
+        return donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM      
     elif Delai:
-        Add.delai(Name)                                               
+        Add.delai(Name)                                        

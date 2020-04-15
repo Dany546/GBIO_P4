@@ -35,7 +35,7 @@ vit = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
 dis = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]] 
   
 # Double for-loop that runs through all subjects and trials 
-def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,chock_number=1,Trial=0,Type='',noreturn=True):
+def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=False,add=False,zoom=False,chock_number=1,Trial=0,Type='',noreturn=True):
     global donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM, Ipk_A, Ipk_G  
     file=os.listdir("mesures") 
     subjects=[path.split('_')[0]+'_'+path.split('_')[1]+'_'+path.split('_')[2] for i,path in enumerate(file) if i%3 == 0] 
@@ -219,11 +219,11 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                 
                 #%% Basic plot of the data  
                 fig = None ; ax = None
-                if zoom and (not add) and (not Delai):
+                if zoom and (not add) and (not Delai) and (not Force) and (not position):
                     fig = plt.figure(figsize = [3,12]) 
-                elif (not add) and (not Delai):
+                elif (not add) and (not Delai) and (not Force) and (not position):
                     fig = plt.figure(figsize = [15,7])
-                if add or Delai:  
+                if add or Delai or position or Force:  
                     if hb == 'haut': 
                         if block == 'avec':
                             donnees_accX[0].append([bk if st<0 else accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
@@ -320,7 +320,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
                         mini = accX[ipk[chock_number-1]]
                         ax[0].set_ylim([mini-2,-mini])  
                     
-                if (not zoom) and (not add) and (not Delai):
+                if (not zoom) and (not add) and (not Delai) and (not position) and (not Force):
                     # Putting grey patches for cycles
                     for i in range(0,len(cycle_starts)):
                         rect0=plt.Rectangle((time[cycle_starts[i]],ax[0].get_ylim()[0]),\
@@ -344,4 +344,12 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,add=False,zoom=False,ch
         Add.delai(Name,Type)  
     elif Delai:
         return donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM, Ipk_A, Ipk_G      
+    elif position and noreturn:
+        Add.MoyDeplacement(dis,Name,Type)  
+    elif position:
+        return dis 
+    elif Force and noreturn:
+        Add.MoyForces(donnees_GF,donnees_LF,Name,Type)  
+    elif Force:
+        return donnees_GF, donnees_LF    
                                           

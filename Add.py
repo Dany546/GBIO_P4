@@ -35,8 +35,8 @@ def delai(Name,Type):
     dis = gbio.dis
     SF = gbio.donnees_SF
     SM = gbio.donnees_SM  
-    ipk_A = gbio.Ipk_A   
-    ipk_G = gbio.Ipk_G   
+#    ipk_A = gbio.Ipk_A   
+#    ipk_G = gbio.Ipk_G   
     
 #    new_delai_dic = {}
 #    names = ['']
@@ -548,3 +548,91 @@ def block_order():
             new_choc_number[k][j] += choc_number[str(i+1)][str(j+1)] 
         
     return ind, blocks_ind, new_choc_number  
+ 
+def MoyDeplacement(dis,Name,Type) :
+    Max=[np.array([]),np.array([]),np.array([]),np.array([])] 
+    for i in range(4):
+                for j in range(3):
+                    for item in dis[i][j]: 
+                        Max[i]=np.append(Max[i],[np.abs(np.min(item))])              
+    if Type=='all':
+        names=['alex','walid','victor','florent']
+    else :
+        names=[Name]
+  
+    for the_name in names:
+        if not name==the_name:
+            start = 0 ; end = 0
+            if the_name == 'alex':
+                start = 0 ; end = 4
+            elif the_name == 'florent':
+                start = 4 ; end = 8
+            elif the_name == 'victor':
+                start = 8 ; end = 12
+            elif the_name == 'walid':
+                start = 12 ; end = 16
+               
+            Dis = gbio.make_plots(start,end,Name=the_name,position=True,noreturn=False)
+            
+            for i in range(4):
+                for j in range(3):
+                    for item in Dis[i][j]: 
+                        Max[i]=np.append(Max[i],[np.abs(np.min(item))])
+    fig=plt.figure(figsize=[6,6])
+  
+    if Type=="all":
+        Name="general"
+    plt.boxplot(Max)
+    axe=plt.gca()
+    axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
+    axe.set_ylabel("déplacement [cm]")
+    axe.set_title("Boxplot des déplacements maximum par conditions")
+    fig.savefig("figures\Add\Position_%s"%(Name))   
+    
+def MoyForces(G,L,Name,Type) :
+    Max_G=[np.array([]),np.array([]),np.array([]),np.array([])] 
+    Max_L=[np.array([]),np.array([]),np.array([]),np.array([])] 
+    for i in range(4):
+        for j in range(3):
+            for item_G,item_L in zip(G[i][j],L[i][j]): 
+                Max_G[i]=np.append(Max_G[i],[np.max(np.abs(item_G))])  
+                Max_L[i]=np.append(Max_L[i],[np.max(np.abs(item_L))])   
+                
+    if Type=='all':
+        names=['alex','walid','victor','florent'] 
+        for the_name in names:
+            if not Name==the_name:
+                start = 0 ; end = 0
+                if the_name == 'alex':
+                    start = 0 ; end = 4
+                elif the_name == 'florent':
+                    start = 4 ; end = 8
+                elif the_name == 'victor':
+                    start = 8 ; end = 12
+                elif the_name == 'walid':
+                    start = 12 ; end = 16
+                   
+                new_G,new_L = gbio.make_plots(start,end,Name=the_name,Force=True,noreturn=False)
+                
+                for i in range(4):
+                    for j in range(3):
+                        for item_G,item_L in zip(new_G[i][j],new_L[i][j]): 
+                            Max_G[i]=np.append(Max_G[i],[np.max(np.abs(item_G))])  
+                            Max_L[i]=np.append(Max_L[i],[np.max(np.abs(item_L))])
+        Name="general"
+                        
+    fig=plt.figure(figsize=[6,6])  
+    plt.boxplot(Max_G)
+    axe=plt.gca()
+    axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
+    axe.set_ylabel("Force [N]")
+    axe.set_title("Boxplot des Grip Force maximum par conditions")
+    fig.savefig("figures\Add\GF_%s"%(Name)) 
+    
+    fig=plt.figure(figsize=[6,6])  
+    plt.boxplot(Max_L)
+    axe=plt.gca()
+    axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
+    axe.set_ylabel("Force [N]")
+    axe.set_title("Boxplot des Load Force maximum par conditions")
+    fig.savefig("figures\Add\LF_%s"%(Name))    

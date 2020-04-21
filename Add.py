@@ -7,6 +7,7 @@ Created on Tue Mar 24 11:59:09 2020
 import gbio_example_script_collisions_dany as gbio
 from scipy.signal import find_peaks as peaks
 import matplotlib.pyplot as plt
+import erreurs
 import numpy as np 
 
 name = None
@@ -18,9 +19,7 @@ dGF = None
 vit = None
 dis = None
 SF = None
-SM = None 
-ipk_A = None
-ipk_G = None
+SM = None  
 
 def delai(Name,Type): 
     global accX, GF, LF, dGF, name, to_cancel, vit, dis, SF, SM
@@ -35,106 +34,14 @@ def delai(Name,Type):
     dis = gbio.dis
     SF = gbio.donnees_SF
     SM = gbio.donnees_SM  
-#    ipk_A = gbio.Ipk_A   
-#    ipk_G = gbio.Ipk_G   
-    
-#    new_delai_dic = {}
-#    names = ['']
-#    
-#    new = [None for i in range(10)]            
-#    new_delai = [[new,new,new],[new,new,new],[new,new,new],[new,new,new]] 
-#    
-#    A = 0   
-#    G = 0   
-#            
-#    for i in range(4):
-#        for j in range(3):
-#            l=0
-#            for a,p in zip(ipk_A[i][j],ipk_G[i][j]):
-#                if a!=-1: 
-#                    for k in range(400):
-#                        if accX[i][j][l][a-k]==0:
-#                            A = a-k         
-#                        if dGF[i][j][l][p-k]==0:
-#                            G = p-k 
-#                new_delai[i][j][l] = (G-A)*5/4     
-#                l+=1
-#                
-#    new_delai_dic[name] = new_delai    
-#     
-#    if Type=='all': 
-#        names = ['alex','walid','victor','florent']
-#    else:
-#        names = [name]
-#               
-#    for the_name in names:
-#        if not name==the_name:
-#            start = 0 ; end = 0
-#            if the_name == 'alex':
-#                start = 0 ; end = 4
-#            elif the_name == 'florent': 
-#                start = 4 ; end = 8 
-#            elif the_name == 'victor': 
-#                start = 8 ; end = 12
-#            elif the_name == 'walid': 
-#                start = 12 ; end = 16  
-#            _,_,_,_,_,_,tG,_,_,iA,iG = gbio.make_plots(start,end,Delai=True,noreturn=False) 
-#            to_cancel = tG 
-#            ipk_A = iA   
-#            ipk_G = iG  
-#            
-#            A = 0   
-#            G = 0   
-#            
-#            new = [None for i in range(10)]            
-#            new_delai = [[new,new,new],[new,new,new],[new,new,new],[new,new,new]] 
-#            
-#            for i in range(4):
-#                for j in range(3):
-#                    l=0
-#                    for a,p in zip(ipk_A[i][j],ipk_G[i][j]):
-#                        if a!=-1: 
-#                            for k in range(400):
-#                                if accX[i][j][l][a-k]==0:
-#                                    A = a-k         
-#                                if dGF[i][j][l][p-k]==0:
-#                                    G = p-k 
-#                        new_delai[i][j][l] = (G-A)*5/4     
-#                        l+=1
-#                        
-#            new_delai_dic[the_name] = new_delai            
-#    
-#    name_2 = name 
-#    if Type=='all': 
-#        name_2 = 'Moyenne generale'
-#        
-#    new_file = None
-#    try:     
-#        new_file = open("decalage\%s_détails" %(name_2),"w")
-#        blocs = ['haut avec','haut sans','bas avec','bas sans'] 
-#        for key,value in new_delai_dic.items():
-#            new_file.write(key+':')
-#            new_file.write('\n')
-#            for i in range(4):  
-#                for j in range(3): 
-#                    new_file.write('\t'+blocs[i]+'_00%d:\n'%(j+1))
-#                    new_file.write('\n')
-#                    for k,dec in enumerate(value[i][j]):
-#                        new_file.write('\t \t décalage choc %d:\t '%(k+1))
-#                        new_file.write(str(dec)+'\t [ms]')
-#                        new_file.write('\n')    
-#                new_file.write('\n') 
-#        new_file.close()                
-#    except Exception:
-#        raise                  
-#    finally:
-#        if new_file != None:
-#            new_file.close()
-            
+ 
     _,new_GF,_,_,_,_,_,_ = Sum() 
     
+    # pour utiliser les donnnées de tout les sujets
     if Type=='all': 
+        
         new_GF = new_GF/4
+        
         for the_name in ['alex','walid','victor','florent']:
             if not name==the_name:
                 start = 0 ; end = 0
@@ -146,7 +53,7 @@ def delai(Name,Type):
                     start = 8 ; end = 12
                 elif the_name == 'walid': 
                     start = 12 ; end = 16  
-                _,B,_,_,_,_,G,_,_,_,_ = gbio.make_plots(start,end,Name=the_name,Delai=True,noreturn=False) 
+                _,B,_,_,_,_,G,_,_ = gbio.make_plots(start,end,Name=the_name,Delai=True,noreturn=False) 
                 to_cancel = G 
                 GF = B 
                 name = the_name
@@ -183,7 +90,7 @@ def delai(Name,Type):
     finally:
         if new_file != None:
             new_file.close()
- 
+             
 # calcule le decalage entre deux signaux en milisecondes
 def decal(signal_1,signal_2):
     
@@ -200,7 +107,7 @@ def superpose(Name,Type):
     accX = gbio.donnees_accX
     GF = gbio.donnees_GF
     LF = gbio.donnees_LF
-    dGF = gbio.donnees_dGF
+#    dGF = gbio.donnees_dGF
     vit = gbio.vit
     dis = gbio.dis
     SF = gbio.donnees_SF
@@ -214,7 +121,7 @@ def superpose(Name,Type):
                 new_accX[i][j] = new_accX[i][j]/4
                 new_GF[i][j] = new_GF[i][j]/4
                 new_LF[i][j] = new_LF[i][j]/4                 
-                new_dGF[i][j] = new_dGF[i][j]/4
+#                new_dGF[i][j] = new_dGF[i][j]/4
                 new_vit[i][j] = new_vit[i][j]/4
                 new_dis[i][j] = new_dis[i][j]/4
                 new_SF[i][j] = new_SF[i][j]/4
@@ -235,7 +142,7 @@ def superpose(Name,Type):
                 accX = A
                 GF = B
                 LF = C
-                dGF = D
+#                dGF = D
                 vit = E
                 dis = F
                 SF = H
@@ -254,10 +161,10 @@ def superpose(Name,Type):
                     new_LF[mmmh][0] = new_LF[mmmh][0] + item[0]/4
                     new_LF[mmmh][1] = new_LF[mmmh][1] + item[1]/4
                     new_LF[mmmh][2] = new_LF[mmmh][2] + item[2]/4
-                for mmmh,item in enumerate(new_dGF_2):
-                    new_dGF[mmmh][0] = new_dGF[mmmh][0] + item[0]/4
-                    new_dGF[mmmh][1] = new_dGF[mmmh][1] + item[1]/4
-                    new_dGF[mmmh][2] = new_dGF[mmmh][2] + item[2]/4 
+#                for mmmh,item in enumerate(new_dGF_2):
+#                    new_dGF[mmmh][0] = new_dGF[mmmh][0] + item[0]/4
+#                    new_dGF[mmmh][1] = new_dGF[mmmh][1] + item[1]/4
+#                    new_dGF[mmmh][2] = new_dGF[mmmh][2] + item[2]/4 
                 for mmmh,item in enumerate(new_vit_2):
                     new_vit[mmmh][0] = new_vit[mmmh][0] + item[0]/4
                     new_vit[mmmh][1] = new_vit[mmmh][1] + item[1]/4
@@ -280,7 +187,7 @@ def superpose(Name,Type):
     time = np.arange(0,1200*5/4,5/4)
     
     fig = plt.figure(figsize = [8,10])
-    ax  = fig.subplots(4,2)
+    ax  = fig.subplots(3,2)       # 4
     
     fig.suptitle(name, fontsize=16)
         
@@ -290,10 +197,10 @@ def superpose(Name,Type):
     ax[0,0].set_ylabel("Acceleration [m/s^2]", fontsize=13)
     ax[1,0].set_ylabel("LF [N]", fontsize=13)
     ax[2,0].set_ylabel("GF [N]", fontsize=13)
-    ax[3,0].set_ylabel("GF derivative [N/s]", fontsize=13)
+#    ax[3,0].set_ylabel("GF derivative [N/s]", fontsize=13)
     
-    ax[3,0].set_xlabel("Time [ms]", fontsize=13)
-    ax[3,1].set_xlabel("Time [ms]", fontsize=13)
+    ax[2,0].set_xlabel("Time [ms]", fontsize=13)
+    ax[2,1].set_xlabel("Time [ms]", fontsize=13)
     
     colors = ['r','b','r','b']
     cols = [0,0,1,1]
@@ -304,12 +211,12 @@ def superpose(Name,Type):
         col = cols[i]
         color = colors[i] 
         j = 0
-        for item_accX,item_GF,item_LF,item_dGF in zip(new_accX[i],new_GF[i],new_LF[i],new_dGF[i]):
+        for item_accX,item_GF,item_LF in zip(new_accX[i],new_GF[i],new_LF[i]):     #,item_dGF  ,new_dGF[i]
             Color = line_type[j]+color
             lines1[i] = ax[0,col].plot(time,item_accX,Color)
             lines2[j] = ax[1,col].plot(time,item_LF,Color)
             ax[2,col].plot(time,item_GF,Color)
-            ax[3,col].plot(time,item_dGF,Color) 
+#            ax[3,col].plot(time,item_dGF,Color) 
             j+=1
     lines1 = (lines1[0][0],lines1[1][0])  
     lines2 = (lines2[0][0],lines2[1][0],lines2[2][0])  
@@ -411,13 +318,13 @@ def Sum():
             if ind[str(i+1)][str(j+1)] != []:
                 for k in ind[str(i+1)][str(j+1)]: 
                     L = 0 
-                    for item_accX,item_GF,item_LF,item_dGF,item_vit,item_dis,item_SF,item_SM in zip(accX[ind_1][ind_2],GF[ind_1][ind_2],LF[ind_1][ind_2],dGF[ind_1][ind_2],vit[ind_1][ind_2],dis[ind_1][ind_2],SF[ind_1][ind_2],SM[ind_1][ind_2]):
+                    for item_accX,item_GF,item_LF,item_vit,item_dis,item_SF,item_SM in zip(accX[ind_1][ind_2],GF[ind_1][ind_2],LF[ind_1][ind_2],vit[ind_1][ind_2],dis[ind_1][ind_2],SF[ind_1][ind_2],SM[ind_1][ind_2]): # ,item_dGF  ,dGF[ind_1][ind_2] 
                         if k == L: 
                             if np.all(new_donnees_accX[ind_1][j]) == None:
                                 new_donnees_accX[ind_1][j] = item_accX
                                 new_donnees_GF[ind_1][j] = item_GF
                                 new_donnees_LF[ind_1][j] = item_LF 
-                                new_donnees_dGF[ind_1][j] = item_dGF 
+#                                new_donnees_dGF[ind_1][j] = item_dGF 
                                 new_vit[ind_1][j] = item_vit 
                                 new_dis[ind_1][j] = item_dis 
                                 new_SF[ind_1][j] = item_SF 
@@ -426,7 +333,7 @@ def Sum():
                                 new_donnees_accX[ind_1][j] += item_accX
                                 new_donnees_GF[ind_1][j] += item_GF
                                 new_donnees_LF[ind_1][j] += item_LF 
-                                new_donnees_dGF[ind_1][j] += item_dGF 
+#                                new_donnees_dGF[ind_1][j] += item_dGF 
                                 new_vit[ind_1][j] += item_vit 
                                 new_dis[ind_1][j] += item_dis 
                                 new_SF[ind_1][j] += item_SF 
@@ -439,7 +346,7 @@ def Sum():
             new_donnees_accX[i][j] = new_donnees_accX[i][j] / choc_number[i][j]
             new_donnees_GF[i][j] = new_donnees_GF[i][j] / choc_number[i][j]
             new_donnees_LF[i][j] = new_donnees_LF[i][j] / choc_number[i][j]
-            new_donnees_dGF[i][j] = new_donnees_dGF[i][j] / choc_number[i][j] 
+#            new_donnees_dGF[i][j] = new_donnees_dGF[i][j] / choc_number[i][j] 
             new_vit[i][j] = new_vit[i][j] / choc_number[i][j] 
             new_dis[i][j] = new_dis[i][j] / choc_number[i][j] 
             new_SF[i][j] = new_SF[i][j] / choc_number[i][j] 
@@ -589,14 +496,40 @@ def MoyDeplacement(dis,Name,Type) :
     axe.set_title("Boxplot des déplacements maximum par conditions")
     fig.savefig("figures\Add\Position_%s"%(Name))   
     
-def MoyForces(G,L,Name,Type) :
+def MoyForces(G,L,SF,SME,Name,Type):  
+    global name, to_cancel
+    
+    name = Name
+    to_cancel = erreurs.err(Name)
+    
     Max_G=[np.array([]),np.array([]),np.array([]),np.array([])] 
-    Max_L=[np.array([]),np.array([]),np.array([]),np.array([])] 
-    for i in range(4):
-        for j in range(3):
-            for item_G,item_L in zip(G[i][j],L[i][j]): 
-                Max_G[i]=np.append(Max_G[i],[np.max(np.abs(item_G))])  
-                Max_L[i]=np.append(Max_L[i],[np.max(np.abs(item_L))])   
+    Max_L=[np.array([]),np.array([]),np.array([]),np.array([])]  
+    Moy_SME=[np.array([]),np.array([]),np.array([]),np.array([])] 
+    Max_SF=[np.array([]),np.array([]),np.array([]),np.array([])]   
+#    for i in range(4):
+#        for j in range(3):
+#            for item_G,item_L,item_SF in zip(G[i][j],L[i][j],SF[i][j]): #,SM[i][j]): ,item_SM 
+#                if np.nanmax(np.abs(item_G))>0: 
+#                    Max_G[i]=np.append(Max_G[i],[np.nanmax(np.abs(item_G))])  
+#                    Max_L[i]=np.append(Max_L[i],[np.nanmax(np.abs(item_L))]) 
+               # Max_SM[i]=np.append(Max_SM[i],[np.max(np.abs(item_SM))])  
+#                    Max_SF[i]=np.append(Max_SF[i],[np.nanmax(np.abs(item_SF))])  
+#                for item_SME in SME[i][j]: 
+#                    if np.nanmax(np.abs(G[i][j]))>0: 
+                    
+                    
+    ind,blocks_ind,choc_number = block_order() 
+    for i in range(12): 
+        ind_1,ind_2 = blocks_ind[str(i+1)]
+        for key,val in ind[str(i+1)].items(): 
+            if val != []:
+                for k in val:
+                    if np.nanmax(np.abs(G[ind_1][ind_2][k]))>0: 
+                        Max_G[ind_1]=np.append(Max_G[ind_1],[np.nanmax(np.abs(G[ind_1][ind_2][k]))])  
+                        Max_L[ind_1]=np.append(Max_L[ind_1],[np.nanmax(np.abs(L[ind_1][ind_2][k]))]) 
+                        Max_SF[ind_1]=np.append(Max_SF[ind_1],[np.nanmax(np.abs(SF[ind_1][ind_2][k]))]) 
+                    if k<9:
+                        Moy_SME[ind_1]=np.append(Moy_SME[ind_1],[np.nanmean(SME[ind_1][ind_2][k])]) 
                 
     if Type=='all':
         names=['alex','walid','victor','florent'] 
@@ -612,15 +545,39 @@ def MoyForces(G,L,Name,Type) :
                 elif the_name == 'walid':
                     start = 12 ; end = 16
                    
-                new_G,new_L = gbio.make_plots(start,end,Name=the_name,Force=True,noreturn=False)
+                new_G,new_L,new_SF,new_SME = gbio.make_plots(start,end,Name=the_name,Force=True,noreturn=False) #new_SM,
                 
-                for i in range(4):
-                    for j in range(3):
-                        for item_G,item_L in zip(new_G[i][j],new_L[i][j]): 
-                            Max_G[i]=np.append(Max_G[i],[np.max(np.abs(item_G))])  
-                            Max_L[i]=np.append(Max_L[i],[np.max(np.abs(item_L))])
+                name = the_name
+                to_cancel = erreurs.err(the_name)
+                
+                ind,blocks_ind,choc_number = block_order() 
+                for i in range(12): 
+                    ind_1,ind_2 = blocks_ind[str(i+1)]
+                    for key,val in ind[str(i+1)].items(): 
+                        if val != []:
+                            for k in val:
+                                if np.nanmax(np.abs(new_G[ind_1][ind_2][k]))>0: 
+                                    Max_G[ind_1]=np.append(Max_G[ind_1],[np.nanmax(np.abs(new_G[ind_1][ind_2][k]))])  
+                                    Max_L[ind_1]=np.append(Max_L[ind_1],[np.nanmax(np.abs(new_L[ind_1][ind_2][k]))]) 
+                                  # Max_SM[i]=np.append(Max_SM[i],[np.max(np.abs(item_SM))])  
+                                    Max_SF[ind_1]=np.append(Max_SF[ind_1],[np.nanmax(np.abs(new_SF[ind_1][ind_2][k]))]) 
+                                if k<9:
+                                    Moy_SME[ind_1]=np.append(Moy_SME[ind_1],[np.nanmean(new_SME[ind_1][ind_2][k])]) 
+                
+#                for i in range(4):
+#                    for j in range(3):
+#                        for item_G,item_L,item_SF in zip(new_G[i][j],new_L[i][j],new_SF[i][j]): #,new_SM[i][j]): ,item_SM 
+#                            if np.nanmax(np.abs(item_G))>0: 
+#                                Max_G[i]=np.append(Max_G[i],[np.nanmax(np.abs(item_G))])  
+#                                Max_L[i]=np.append(Max_L[i],[np.nanmax(np.abs(item_L))]) 
+#                            #Max_SM[i]=np.append(Max_SM[i],[np.max(np.abs(item_SM))])  
+#                            Max_SF[i]=np.append(Max_SF[i],[np.nanmax(np.abs(item_SF))])  
+#                        for item_SME in new_SME[i][j]: 
+#                            if np.nanmax(np.abs(G[i][j]))>0: 
+#                                Moy_SME[i]=np.append(Moy_SME[i],[np.nanmean(item_SME)])  
         Name="general"
-                        
+    
+    # Grip Force                    
     fig=plt.figure(figsize=[6,6])  
     plt.boxplot(Max_G)
     axe=plt.gca()
@@ -629,10 +586,29 @@ def MoyForces(G,L,Name,Type) :
     axe.set_title("Boxplot des Grip Force maximum par conditions")
     fig.savefig("figures\Add\GF_%s"%(Name)) 
     
+    # Load Force 
     fig=plt.figure(figsize=[6,6])  
     plt.boxplot(Max_L)
     axe=plt.gca()
     axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
     axe.set_ylabel("Force [N]")
     axe.set_title("Boxplot des Load Force maximum par conditions")
-    fig.savefig("figures\Add\LF_%s"%(Name))    
+    fig.savefig("figures\Add\LF_%s"%(Name))   
+    
+    # Slip Force 
+    fig=plt.figure(figsize=[6,6])  
+    plt.boxplot(Max_SF)
+    axe=plt.gca()
+    axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
+    axe.set_ylabel("Force [N]")
+    axe.set_title("Boxplot des Slip Force maximum par conditions")
+    fig.savefig("figures\Add\SF_%s"%(Name))  
+    
+    # Security marge entre
+    fig=plt.figure(figsize=[6,6])  
+    plt.boxplot(Moy_SME)
+    axe=plt.gca()
+    axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
+    axe.set_ylabel("Force [N]")
+    axe.set_title("Boxplot des Security marge moyenne par conditions")
+    fig.savefig("figures\Add\SM_entre_%s"%(Name))    

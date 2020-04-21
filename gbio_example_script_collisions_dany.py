@@ -6,7 +6,7 @@ manipulandum (file TEST_DATA.glm)
 
 Created on Wed Jan 29 11:16:06 2020
 
-@author: opsomerl & fschiltz
+@author: opsomerl & fschiltz edited by group 5
 """
 #%% Importation des librairies necessaires
 import numpy as np
@@ -28,32 +28,35 @@ donnees_LF = [[],[],[],[]]
 donnees_dGF = [[],[],[],[]] 
 donnees_SF = [[],[],[],[]] 
 donnees_SM = [[],[],[],[]] 
-to_cancel = None 
-Ipk_A = [[],[],[],[]] 
-Ipk_G = [[],[],[],[]] 
+donnees_SM_e = [[],[],[],[]] 
+to_cancel = None  
 vit = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
 dis = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]] 
-  
+
+file=os.listdir("mesures") 
+subjects=[path.split('_')[0]+'_'+path.split('_')[1]+'_'+path.split('_')[2] for i,path in enumerate(file) if i%3 == 0] 
+      
 # Double for-loop that runs through all subjects and trials 
 def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=False,add=False,zoom=False,chock_number=1,Trial=0,Type='',noreturn=True):
     global donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM, Ipk_A, Ipk_G  
-    file=os.listdir("mesures") 
-    subjects=[path.split('_')[0]+'_'+path.split('_')[1]+'_'+path.split('_')[2] for i,path in enumerate(file) if i%3 == 0] 
+    
     donnees_accX = [[],[],[],[]] # haut avec, haut sans, bas avec, bas sans
     donnees_GF = [[],[],[],[]] 
     donnees_LF = [[],[],[],[]]  
     donnees_dGF = [[],[],[],[]]  
     donnees_SF = [[],[],[],[]] 
     donnees_SM = [[],[],[],[]] 
-    Ipk_A = [[],[],[],[]] 
-    Ipk_G = [[],[],[],[]]  
+    donnees_SM_e = [[],[],[],[]]  
     vit = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
     dis = [[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]] 
-    subjects = subjects[beginning:The_end]
+    
+    newsubjects = subjects[beginning:The_end]
     to_cancel = erreurs.err(Name)
-    if zoom and (not add) and (not Delai): 
-        subjects = [subjects]         
-    for s in subjects:
+    
+    if zoom and (not add) and (not Delai) and (not position) and (not Force): 
+        newsubjects = [newsubjects]         
+    
+    for s in newsubjects:
         name,hb,block = s.split('_')[:3] 
         for trial in range(1,4): 
             if trial==Trial or Trial==0:
@@ -84,7 +87,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
                 accX  = accX-np.nanmean(accX[baseline])
                 GF    = glm_df.loc[:,'GF'].to_numpy()
                 
-                if name=='victor' and hb=='bas' and  block=='sans' and trial==1:
+                if s=='victor_bas_sans' and trial==1:
                     GF = GF-np.nanmin(GF)
                 else: 
                     GF = GF-np.nanmean(GF[baseline])
@@ -105,67 +108,45 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
                 LFh   = glm.filter_signal(LFh,   fs = freqAcq, fc = freqFiltForces)
                        
                 #%% Compute derivative of LF
-                dGF=der.derive(GF,800)
-                dGF=glm.filter_signal(dGF, fs = freqAcq, fc = 10) 
+#                dGF=der.derive(GF,800)
+#                dGF=glm.filter_signal(dGF, fs = freqAcq, fc = 10) 
                 
                 #%% CUTTING THE TASK INTO SEGMENTS (your first task)
                 pk = signal.find_peaks(abs(accX),prominence=4.5,distance=2000) # avant:prominence=9,distance=1000
                 ipk = pk[0] 
                 
-                pkg = signal.find_peaks(abs(dGF),prominence=20,distance=2000) # avant:prominence=9,distance=1000
-                ipkg = pkg[0] 
-                 
                 if name=='victor' and hb=='haut' and block=='avec' and trial==1:
-                    ip = [-1 if ii == 4 else ipk[ii] for ii in range(5)]
-                    ipg = [-1 if ii == 4 else ipkg[ii] for ii in range(5)]
-                    ipk = np.append(ip,ipk[4:])
-                    ipkg = np.append(ipg,ipkg[4:])
+                    ip = [-1 if ii == 4 else ipk[ii] for ii in range(5)] 
+                    ipk = np.append(ip,ipk[4:]) 
                 elif name=='victor' and hb=='bas' and block=='sans' and trial==1: 
-                    ipk = np.append([-1],ipk) 
-                    ipkg = np.append([-1],ipkg) 
+                    ipk = np.append([-1],ipk)  
                 elif name=='alex' and hb=='bas' and block=='sans' and trial==1:
-                    ip = [-1 if ii == 2 else ipk[ii] for ii in range(3)]
-                    ipg = [-1 if ii == 2 else ipkg[ii] for ii in range(3)]
-                    ipk = np.append(ip,ipk[2:]) 
-                    ipkg = np.append(ipg,ipkg[2:]) 
+                    ip = [-1 if ii == 2 else ipk[ii] for ii in range(3)] 
+                    ipk = np.append(ip,ipk[2:])   
                 elif name=='alex' and hb=='haut' and block=='avec' and trial==2:
-                    ip = [-1 if ii == 6 else ipk[ii] for ii in range(7)]
-                    ipg = [-1 if ii == 6 else ipkg[ii] for ii in range(7)]
-                    ipk = np.append(ip,ipk[6:])  
-                    ipkg = np.append(ipg,ipkg[6:]) 
+                    ip = [-1 if ii == 6 else ipk[ii] for ii in range(7)] 
+                    ipk = np.append(ip,ipk[6:])   
                 elif name=='florent' and hb=='bas' and block=='avec' and trial==1:
-                    ip = [-1 if ii == 1 else ipk[ii] for ii in range(2)]
-                    ipg = [-1 if ii == 1 else ipkg[ii] for ii in range(2)]
-                    ipk = np.append(ip,ipk[1:])  
-                    ipkg = np.append(ipg,ipkg[1:]) 
+                    ip = [-1 if ii == 1 else ipk[ii] for ii in range(2)] 
+                    ipk = np.append(ip,ipk[1:])   
                 elif name=='florent' and hb=='haut' and block=='avec' and trial==2:
-                    ip = [-1 if ii == 6 else ipk[ii] for ii in range(7)]
-                    ipg = [-1 if ii == 6 else ipkg[ii] for ii in range(7)]
-                    ipk = np.append(ip,ipk[6:])  
-                    ipkg = np.append(ipg,ipkg[6:]) 
+                    ip = [-1 if ii == 6 else ipk[ii] for ii in range(7)] 
+                    ipk = np.append(ip,ipk[6:])   
                 elif name=='florent' and hb=='bas' and block=='sans' and trial==1:
-                    ip = [-1 if ii == 7 else ipk[ii] for ii in range(8)]
-                    ipg = [-1 if ii == 7 else ipkg[ii] for ii in range(8)]
-                    ipk = np.append(ip,ipk[7:])  
-                    ipkg = np.append(ipg,ipkg[7:]) 
+                    ip = [-1 if ii == 7 else ipk[ii] for ii in range(8)] 
+                    ipk = np.append(ip,ipk[7:])   
                 elif name=='florent' and hb=='haut' and block=='sans' and trial==3:
-                    ip = [-1 if ii == 4 else ipk[ii] for ii in range(5)]
-                    ipg = [-1 if ii == 4 else ipkg[ii] for ii in range(5)]
-                    ipk = np.append(ip,ipk[4:])  
-                    ipkg = np.append(ipg,ipkg[4:]) 
+                    ip = [-1 if ii == 4 else ipk[ii] for ii in range(5)] 
+                    ipk = np.append(ip,ipk[4:])   
                         
                 if len(ipk)>10:
-                    ipk = ipk[:10]  
-                    ipkg = ipkg[:10]  
+                    ipk = ipk[:10]   
                 
                 bk = np.zeros(1200)    
                          
                 cycle_starts = ipk-400  # 1 seconde = 800 
                 cycle_ends = ipk+800
-                
-                cycle_starts_G = ipkg-400  # 1 seconde = 800 
-                cycle_ends_G = ipkg+800
-                
+                 
                 start = time[cycle_starts[chock_number-1]] 
                 end = time[cycle_ends[chock_number-1]] 
                 
@@ -173,7 +154,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
                     accX = accX[0:ipk[-1]+3200]  
                     GF   = GF[0:ipk[-1]+3200]
                     LF   = LF[0:ipk[-1]+3200]
-                    dGF  = dGF[0:ipk[-1]+3200] 
+#                    dGF  = dGF[0:ipk[-1]+3200] 
                     time  = time[0:ipk[-1]+3200] 
                 
                 #%%   alexandre était ici :)  
@@ -202,18 +183,18 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
                 #%%    SF et SM 
                 #Calcule de la slip force en fonction des coefficients de chacun
                 if s[0]=="a":
-                    SF=pow(LF/2*K_CoeffAlex,1/N_CoeffAlex) 
+                    SF=pow(np.abs(LF)/2*K_CoeffAlex,1/N_CoeffAlex) 
                     
                 if s[0]=="f":
-                    SF=pow(LF/2*K_CoeffFlo,1/N_CoeffFlo) 
+                    SF=pow(np.abs(LF)/2*K_CoeffFlo,1/N_CoeffFlo) 
                 
                 if s[0]=="v":
-                    SF=pow(LF/2*K_CoeffVictor,1/N_CoeffVictor) 
+                    SF=pow(np.abs(LF)/2*K_CoeffVictor,1/N_CoeffVictor) 
                 
                 if s[0]=="w":
-                    SF=pow(LF/2*K_CoeffWalid,1/N_CoeffWalid) 
+                    SF=pow(np.abs(LF)/2*K_CoeffWalid,1/N_CoeffWalid) 
             
-                SM=GF-SF
+                SM = GF-SF
                 
                 #%% alexandre est parti :( 
                 
@@ -223,17 +204,18 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
                     fig = plt.figure(figsize = [3,12]) 
                 elif (not add) and (not Delai) and (not Force) and (not position):
                     fig = plt.figure(figsize = [15,7])
+               
+                # stocke les différentes données des chocs
                 if add or Delai or position or Force:  
                     if hb == 'haut': 
                         if block == 'avec':
                             donnees_accX[0].append([bk if st<0 else accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_GF[0].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[0].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_dGF[0].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
+#                            donnees_dGF[0].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
                             donnees_SF[0].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
                             donnees_SM[0].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            Ipk_A[0].append([ipk[st]-e for st,e in enumerate(cycle_starts)])  
-                            Ipk_G[0].append([ipkg[st]-e for st,e in enumerate(cycle_starts_G)])  
+                            donnees_SM_e[0].append([SM[e:st] for e,st in zip(cycle_ends[:-1],cycle_starts[1:]) if st>0]) 
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0: 
                                     vit[0][trial-1].append(bk) 
@@ -246,11 +228,10 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
                             donnees_accX[1].append([bk if st<0 else accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_GF[1].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[1].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_dGF[1].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+#                            donnees_dGF[1].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_SF[1].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
                             donnees_SM[1].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)])
-                            Ipk_A[1].append([ipk[st]-e for st,e in enumerate(cycle_starts)])  
-                            Ipk_G[1].append([ipkg[st]-e for st,e in enumerate(cycle_starts_G)])  
+                            donnees_SM_e[1].append([ SM[e:st] for e,st in zip(cycle_ends[:-1],cycle_starts[1:]) if st>0])
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0: 
                                     vit[1][trial-1].append(bk) 
@@ -264,11 +245,10 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
                             donnees_accX[2].append([bk if st<0 else accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_GF[2].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[2].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_dGF[2].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
+#                            donnees_dGF[2].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_SF[2].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
                             donnees_SM[2].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)])
-                            Ipk_A[2].append([ipk[st]-e for st,e in enumerate(cycle_starts)])  
-                            Ipk_G[2].append([ipkg[st]-e for st,e in enumerate(cycle_starts_G)])  
+                            donnees_SM_e[2].append([ SM[st:e] for e,st in zip(cycle_ends[:-1],cycle_starts[1:]) if st>0])
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0: 
                                     vit[2][trial-1].append(bk) 
@@ -281,11 +261,10 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
                             donnees_accX[3].append([bk if st<0 else accX[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_GF[3].append([bk if st<0 else GF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
                             donnees_LF[3].append([bk if st<0 else LF[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            donnees_dGF[3].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
+#                            donnees_dGF[3].append([bk if st<0 else dGF[st:e] for st,e in zip(cycle_starts,cycle_ends)])  
                             donnees_SF[3].append([bk if st<0 else SF[st:e] for st,e in zip(cycle_starts,cycle_ends)])
                             donnees_SM[3].append([bk if st<0 else SM[st:e] for st,e in zip(cycle_starts,cycle_ends)]) 
-                            Ipk_A[3].append([ipk[st]-e for st,e in enumerate(cycle_starts)])  
-                            Ipk_G[3].append([ipkg[st]-e for st,e in enumerate(cycle_starts_G)])  
+                            donnees_SM_e[3].append([ SM[e:st] for e,st in zip(cycle_ends[:-1],cycle_starts[1:]) if st>0])
                             for st,e in zip(cycle_starts,cycle_ends):
                                 if st<0:  
                                     vit[3][trial-1].append(bk) 
@@ -295,7 +274,7 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
                                     vit[3][trial-1].append(v) 
                                     dis[3][trial-1].append(d)  
                 else:    
-                    ax  = fig.subplots(3,1) 
+                    ax  = fig.subplots(2,1)       # 3
                     
                     ax[0].set_ylabel("Acceleration [m/s^2]", fontsize=13)
                     ax[0].set_title("Simple example of GLM data", fontsize=14, fontweight="bold")
@@ -303,8 +282,8 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
                     ax[1].set_xlabel("Time [s]", fontsize=13)
                     ax[1].set_ylabel("Forces [N]", fontsize=13)
                     
-                    ax[2].set_xlabel("Time [s]", fontsize=13)
-                    ax[2].set_ylabel("GF derivative [N/s]", fontsize=13)
+#                    ax[2].set_xlabel("Time [s]", fontsize=13)
+#                    ax[2].set_ylabel("GF derivative [N/s]", fontsize=13)
                     
                     ax[0].plot(time, accX)
                     ax[0].plot(time[ipk],accX[ipk], linestyle='', marker='o', 
@@ -312,11 +291,11 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
                     ax[1].plot(time,LF, label="LF")
                     ax[1].plot(time,GF, label="GF")
                     ax[1].legend(fontsize=12)
-                    ax[2].plot(time,dGF)
+#                    ax[2].plot(time,dGF)
                     if zoom:
                         ax[0].set_xlim([start,end])
                         ax[1].set_xlim([start,end])
-                        ax[2].set_xlim([start,end])
+#                        ax[2].set_xlim([start,end])
                         mini = accX[ipk[chock_number-1]]
                         ax[0].set_ylim([mini-2,-mini])  
                     
@@ -343,13 +322,13 @@ def make_plots(beginning,The_end,Name='alex',Delai=False,Force=False,position=Fa
     elif Delai and noreturn:
         Add.delai(Name,Type)  
     elif Delai:
-        return donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM, Ipk_A, Ipk_G      
+        return donnees_accX, donnees_GF, donnees_LF, donnees_dGF, vit, dis, to_cancel, donnees_SF, donnees_SM      
     elif position and noreturn:
         Add.MoyDeplacement(dis,Name,Type)  
     elif position:
         return dis 
     elif Force and noreturn:
-        Add.MoyForces(donnees_GF,donnees_LF,Name,Type)  
+        Add.MoyForces(donnees_GF,donnees_LF, donnees_SF, donnees_SM_e ,Name,Type)  # donnees_SM, 
     elif Force:
-        return donnees_GF, donnees_LF    
+        return donnees_GF, donnees_LF , donnees_SF, donnees_SM_e        #  donnees_SM, 
                                           

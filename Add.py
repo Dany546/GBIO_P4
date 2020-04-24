@@ -561,6 +561,9 @@ def MoyForces(G,L,SF,SME,Name,Type):
 #   tab est un tableau 4x3xn (les 4 conditions, 3 blocs par conditions
 #   et n chocs par bloc, n<=10), chacun de ses éléments est un tableau 
 #   contenant une des variable d'intérêt mesurée lors d'un choc  
+#    
+#   tab peut être produit par gbio_example_script_collisions_dany.make_plots()
+#   en mode return (mettre noreturn=False en argument)    
 # =============================================================================
 def Sum2(tab, fun, Name):  
     global name, to_cancel

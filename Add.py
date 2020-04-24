@@ -21,84 +21,9 @@ dis = None
 SF = None
 SM = None  
 
-def delai(Name,Type): 
-    global accX, GF, LF, dGF, name, to_cancel, vit, dis, SF, SM
-         
-    name = Name  
-    to_cancel = gbio.to_cancel 
-    accX = gbio.donnees_accX
-    GF = gbio.donnees_GF
-    LF = gbio.donnees_LF
-    dGF = gbio.donnees_dGF
-    vit = gbio.vit
-    dis = gbio.dis
-    SF = gbio.donnees_SF
-    SM = gbio.donnees_SM  
- 
-    _,new_GF,_,_,_,_,_,_ = Sum() 
-    
-    # pour utiliser les donnnées de tout les sujets
-    if Type=='all': 
-        
-        new_GF = new_GF/4
-        
-        for the_name in ['alex','walid','victor','florent']:
-            if not name==the_name:
-                start = 0 ; end = 0
-                if the_name == 'alex':
-                    start = 0 ; end = 4
-                elif the_name == 'florent': 
-                    start = 4 ; end = 8 
-                elif the_name == 'victor': 
-                    start = 8 ; end = 12
-                elif the_name == 'walid': 
-                    start = 12 ; end = 16  
-                _,B,_,_,_,_,G,_,_ = gbio.make_plots(start,end,Name=the_name,Delai=True,noreturn=False) 
-                to_cancel = G 
-                GF = B 
-                name = the_name
-                _,new_GF_2,_,_,_,_,_,_ = Sum()  
-                for mmmh,item in enumerate(new_GF_2):
-                    new_GF[mmmh][0] = new_GF[mmmh][0] + item[0]/4
-                    new_GF[mmmh][1] = new_GF[mmmh][1] + item[1]/4
-                    new_GF[mmmh][2] = new_GF[mmmh][2] + item[2]/4   
-                    
-        name = 'Moyenne générale' 
-        
-    new_delai = [[None,None,None],[None,None,None]] 
-      
-    for i in range(2):
-        for j in range(3):
-            new_delai[i][j] = decal(new_GF[i*2][j],new_GF[(i*2)+1][j])
-    
-    # écris tout dans un fichier texte   
-    new_file = None
-    try:     
-        new_file = open("decalage\%s" %(name),"w")
-        blocs = ['haut','bas']  
-        for i in range(2): 
-            new_file.write(blocs[i]+':\n')
-            for j in range(3): 
-                new_file.write('\t décalage moyen masse %d:\t ' %(j+1))
-                for dec in new_delai[i][j]:
-                    new_file.write(str(dec)+'\t [ms]')
-                new_file.write('\n')    
-            new_file.write('\n') 
-        new_file.close()                
-    except Exception:
-        raise                  
-    finally:
-        if new_file != None:
-            new_file.close()
-             
-# calcule le decalage entre deux signaux en milisecondes
-def decal(signal_1,signal_2):
-    
-    pk_1 = peaks(signal_1,prominence=10,distance=800) 
-    pk_2 = peaks(signal_2,prominence=10,distance=800)  
-    
-    return abs(pk_1[0]-pk_2[0])*5/4   # 1000/800 = 5/4 
-    
+# =============================================================================
+#   fait de jolis plots
+# =============================================================================
 def superpose(Name,Type):
     global accX, GF, LF, dGF, name, to_cancel, vit, dis, SF, SM
          
@@ -298,6 +223,9 @@ def superpose(Name,Type):
     fig.legend(lines2, ('100 g', '200 g', '300 g'), loc='upper right', bbox_to_anchor=(1, 0.95))    
     fig.savefig("figures\Add\%s_marge_de_secu.png" %(name)) 
      
+# =============================================================================
+#   renvoie les moyennes sur chaque masse des variables d'intérêts pour chaque conditions    
+# =============================================================================
 def Sum():
     global accX, GF, LF, dGF, to_cancel, vit, dis, name, SF, SM
     
@@ -353,7 +281,10 @@ def Sum():
             new_SM[i][j] = new_SM[i][j] / choc_number[i][j] 
                     
     return new_donnees_accX, new_donnees_GF, new_donnees_LF, new_donnees_dGF , new_vit, new_dis, new_SF, new_SM                       
-                    
+    
+# =============================================================================
+#                 
+# =============================================================================
 def block_order(): 
     global name, to_cancel
     
@@ -456,6 +387,9 @@ def block_order():
         
     return ind, blocks_ind, new_choc_number  
  
+# =============================================================================
+#     
+# =============================================================================
 def MoyDeplacement(dis,Name,Type) :
     Max=[np.array([]),np.array([]),np.array([]),np.array([])] 
     for i in range(4):
@@ -495,7 +429,10 @@ def MoyDeplacement(dis,Name,Type) :
     axe.set_ylabel("déplacement [cm]")
     axe.set_title("Boxplot des déplacements maximum par conditions")
     fig.savefig("figures\Add\Position_%s"%(Name))   
-    
+
+# =============================================================================
+#     
+# =============================================================================
 def MoyForces(G,L,SF,SME,Name,Type):  
     global name, to_cancel
     
@@ -623,10 +560,7 @@ def MoyForces(G,L,SF,SME,Name,Type):
 #    
 #   tab est un tableau 4x3xn (les 4 conditions, 3 blocs par conditions
 #   et n chocs par bloc, n<=10), chacun de ses éléments est un tableau 
-#   contenant une des variable d'intérêt mesurée lors d'un choc 
-#    
-#   les données sont )    
-#   
+#   contenant une des variable d'intérêt mesurée lors d'un choc  
 # =============================================================================
 def Sum2(tab, fun, Name):  
     global name, to_cancel
@@ -649,5 +583,4 @@ def Sum2(tab, fun, Name):
                                 new_tab[ind_1][j] = np.append(new_tab[ind_1][j],fun(item)) 
                         L += 1        
               
-    return new_tab                     
-                    
+    return new_tab         

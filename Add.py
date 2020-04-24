@@ -221,7 +221,7 @@ def superpose(Name,Type):
     lines1 = (lines1[0][0],lines1[1][0])  
     lines2 = (lines2[0][0],lines2[1][0],lines2[2][0])  
     fig.legend(lines1, ('avec anticipation', 'sans anticipation'), loc='upper right') 
-    fig.legend(lines2, ('masse 1', 'masse 2', 'masse 3'), loc='upper right', bbox_to_anchor=(1, 0.95))    
+    fig.legend(lines2, ('100 g', '200 g', '300 g'), loc='upper right', bbox_to_anchor=(1, 0.95))    
     fig.savefig("figures\Add\%s_acc_forces_dGF.png" %(name)) 
     
     fig = plt.figure(figsize = [8,10])
@@ -256,7 +256,7 @@ def superpose(Name,Type):
     lines1 = (lines1[0][0],lines1[1][0])  
     lines2 = (lines2[0][0],lines2[1][0],lines2[2][0])  
     fig.legend(lines1, ('avec anticipation', 'sans anticipation'), loc='upper right') 
-    fig.legend(lines2, ('masse 1', 'masse 2', 'masse 3'), loc='upper right', bbox_to_anchor=(1, 0.95))    
+    fig.legend(lines2, ('100 g', '200 g', '300 g'), loc='upper right', bbox_to_anchor=(1, 0.95))    
     fig.savefig("figures\Add\%s_dist.png" %(name))
     
     fig = plt.figure(figsize = [8,10])
@@ -295,7 +295,7 @@ def superpose(Name,Type):
     lines1 = (lines1[0][0],lines1[1][0])  
     lines2 = (lines2[0][0],lines2[1][0],lines2[2][0])  
     fig.legend(lines1, ('avec anticipation', 'sans anticipation'), loc='upper right') 
-    fig.legend(lines2, ('masse 1', 'masse 2', 'masse 3'), loc='upper right', bbox_to_anchor=(1, 0.95))    
+    fig.legend(lines2, ('100 g', '200 g', '300 g'), loc='upper right', bbox_to_anchor=(1, 0.95))    
     fig.savefig("figures\Add\%s_marge_de_secu.png" %(name)) 
      
 def Sum():
@@ -611,4 +611,43 @@ def MoyForces(G,L,SF,SME,Name,Type):
     axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
     axe.set_ylabel("Force [N]")
     axe.set_title("Boxplot des Security marge moyenne par conditions")
-    fig.savefig("figures\Add\SM_entre_%s"%(Name))    
+    fig.savefig("figures\Add\SM_entre_%s"%(Name))  
+    
+# =============================================================================
+#   retourne un tableau contenant les données de tab pour le sujet Name
+#   ce nouveau tableau possède 4 lignes (les 4 conditions), 3 colonnes 
+#   (les 3 masses) et chacun de ses éléments est un tableau de n éléments 
+#   (n chocs lors du bloc, n<=10), eux-mêmes extraits des éléments de tab 
+#   grâce à la fonction fun (par example, si fun est np.max, on retourne 
+#   un tableau contenant les max des éléments de tab    
+#    
+#   tab est un tableau 4x3xn (les 4 conditions, 3 blocs par conditions
+#   et n chocs par bloc, n<=10), chacun de ses éléments est un tableau 
+#   contenant une des variable d'intérêt mesurée lors d'un choc 
+#    
+#   les données sont )    
+#   
+# =============================================================================
+def Sum2(tab, fun, Name):  
+    global name, to_cancel
+    
+    name = Name ; to_cancel = erreurs.err(Name) 
+    new_tab = np.array([np.array([None,None,None]) for i in range(4)])
+      
+    ind,blocks_ind,choc_number = block_order() 
+    for i in range(12): 
+        ind_1,ind_2 = blocks_ind[str(i+1)]
+        for j in range(3):
+            if ind[str(i+1)][str(j+1)] != []:
+                for k in ind[str(i+1)][str(j+1)]: 
+                    L = 0 
+                    for item in tab[ind_1][ind_2]: 
+                        if k == L:  
+                            if np.all(new_tab[ind_1][j]) == None: 
+                                new_tab[ind_1][j] = [fun(item)]  
+                            else: 
+                                new_tab[ind_1][j] = np.append(new_tab[ind_1][j],fun(item)) 
+                        L += 1        
+              
+    return new_tab                     
+                    

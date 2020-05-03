@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
 """
 Created on Tue Mar 24 11:59:09 2020
 
 @author: Dany
 """
-import gbio_example_script_collisions_dany as gbio
-from scipy.signal import find_peaks as peaks
+import gbio_example_script_collisions as gbio 
 import matplotlib.pyplot as plt
-import erreurs
 import numpy as np 
+import erreurs
 
 name = None
 to_cancel = None
@@ -386,170 +384,7 @@ def block_order():
             new_choc_number[k][j] += choc_number[str(i+1)][str(j+1)] 
         
     return ind, blocks_ind, new_choc_number  
- 
-# =============================================================================
-#     
-# =============================================================================
-def MoyDeplacement(dis,Name,Type) :
-    Max=[np.array([]),np.array([]),np.array([]),np.array([])] 
-    for i in range(4):
-                for j in range(3):
-                    for item in dis[i][j]: 
-                        Max[i]=np.append(Max[i],[np.abs(np.min(item))])              
-    if Type=='all':
-        names=['alex','walid','victor','florent']
-    else :
-        names=[Name]
-  
-    for the_name in names:
-        if not name==the_name:
-            start = 0 ; end = 0
-            if the_name == 'alex':
-                start = 0 ; end = 4
-            elif the_name == 'florent':
-                start = 4 ; end = 8
-            elif the_name == 'victor':
-                start = 8 ; end = 12
-            elif the_name == 'walid':
-                start = 12 ; end = 16
-               
-            Dis = gbio.make_plots(start,end,Name=the_name,position=True,noreturn=False)
-            
-            for i in range(4):
-                for j in range(3):
-                    for item in Dis[i][j]: 
-                        Max[i]=np.append(Max[i],[np.abs(np.min(item))])
-    fig=plt.figure(figsize=[6,6])
-  
-    if Type=="all":
-        Name="general"
-    plt.boxplot(Max)
-    axe=plt.gca()
-    axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
-    axe.set_ylabel("déplacement [cm]")
-    axe.set_title("Boxplot des déplacements maximum par conditions")
-    fig.savefig("figures\Add\Position_%s"%(Name))   
 
-# =============================================================================
-#     
-# =============================================================================
-def MoyForces(G,L,SF,SME,Name,Type):  
-    global name, to_cancel
-    
-    name = Name
-    to_cancel = erreurs.err(Name)
-    
-    Max_G=[np.array([]),np.array([]),np.array([]),np.array([])] 
-    Max_L=[np.array([]),np.array([]),np.array([]),np.array([])]  
-    Moy_SME=[np.array([]),np.array([]),np.array([]),np.array([])] 
-    Max_SF=[np.array([]),np.array([]),np.array([]),np.array([])]   
-#    for i in range(4):
-#        for j in range(3):
-#            for item_G,item_L,item_SF in zip(G[i][j],L[i][j],SF[i][j]): #,SM[i][j]): ,item_SM 
-#                if np.nanmax(np.abs(item_G))>0: 
-#                    Max_G[i]=np.append(Max_G[i],[np.nanmax(np.abs(item_G))])  
-#                    Max_L[i]=np.append(Max_L[i],[np.nanmax(np.abs(item_L))]) 
-               # Max_SM[i]=np.append(Max_SM[i],[np.max(np.abs(item_SM))])  
-#                    Max_SF[i]=np.append(Max_SF[i],[np.nanmax(np.abs(item_SF))])  
-#                for item_SME in SME[i][j]: 
-#                    if np.nanmax(np.abs(G[i][j]))>0: 
-                    
-                    
-    ind,blocks_ind,choc_number = block_order() 
-    for i in range(12): 
-        ind_1,ind_2 = blocks_ind[str(i+1)]
-        for key,val in ind[str(i+1)].items(): 
-            if val != []:
-                for k in val:
-                    if np.nanmax(np.abs(G[ind_1][ind_2][k]))>0: 
-                        Max_G[ind_1]=np.append(Max_G[ind_1],[np.nanmax(np.abs(G[ind_1][ind_2][k]))])  
-                        Max_L[ind_1]=np.append(Max_L[ind_1],[np.nanmax(np.abs(L[ind_1][ind_2][k]))]) 
-                        Max_SF[ind_1]=np.append(Max_SF[ind_1],[np.nanmax(np.abs(SF[ind_1][ind_2][k]))]) 
-                    if k<9:
-                        Moy_SME[ind_1]=np.append(Moy_SME[ind_1],[np.nanmean(SME[ind_1][ind_2][k])]) 
-                
-    if Type=='all':
-        names=['alex','walid','victor','florent'] 
-        for the_name in names:
-            if not Name==the_name:
-                start = 0 ; end = 0
-                if the_name == 'alex':
-                    start = 0 ; end = 4
-                elif the_name == 'florent':
-                    start = 4 ; end = 8
-                elif the_name == 'victor':
-                    start = 8 ; end = 12
-                elif the_name == 'walid':
-                    start = 12 ; end = 16
-                   
-                new_G,new_L,new_SF,new_SME = gbio.make_plots(start,end,Name=the_name,Force=True,noreturn=False) #new_SM,
-                
-                name = the_name
-                to_cancel = erreurs.err(the_name)
-                
-                ind,blocks_ind,choc_number = block_order() 
-                for i in range(12): 
-                    ind_1,ind_2 = blocks_ind[str(i+1)]
-                    for key,val in ind[str(i+1)].items(): 
-                        if val != []:
-                            for k in val:
-                                if np.nanmax(np.abs(new_G[ind_1][ind_2][k]))>0: 
-                                    Max_G[ind_1]=np.append(Max_G[ind_1],[np.nanmax(np.abs(new_G[ind_1][ind_2][k]))])  
-                                    Max_L[ind_1]=np.append(Max_L[ind_1],[np.nanmax(np.abs(new_L[ind_1][ind_2][k]))]) 
-                                  # Max_SM[i]=np.append(Max_SM[i],[np.max(np.abs(item_SM))])  
-                                    Max_SF[ind_1]=np.append(Max_SF[ind_1],[np.nanmax(np.abs(new_SF[ind_1][ind_2][k]))]) 
-                                if k<9:
-                                    Moy_SME[ind_1]=np.append(Moy_SME[ind_1],[np.nanmean(new_SME[ind_1][ind_2][k])]) 
-                
-#                for i in range(4):
-#                    for j in range(3):
-#                        for item_G,item_L,item_SF in zip(new_G[i][j],new_L[i][j],new_SF[i][j]): #,new_SM[i][j]): ,item_SM 
-#                            if np.nanmax(np.abs(item_G))>0: 
-#                                Max_G[i]=np.append(Max_G[i],[np.nanmax(np.abs(item_G))])  
-#                                Max_L[i]=np.append(Max_L[i],[np.nanmax(np.abs(item_L))]) 
-#                            #Max_SM[i]=np.append(Max_SM[i],[np.max(np.abs(item_SM))])  
-#                            Max_SF[i]=np.append(Max_SF[i],[np.nanmax(np.abs(item_SF))])  
-#                        for item_SME in new_SME[i][j]: 
-#                            if np.nanmax(np.abs(G[i][j]))>0: 
-#                                Moy_SME[i]=np.append(Moy_SME[i],[np.nanmean(item_SME)])  
-        Name="general"
-    
-    # Grip Force                    
-    fig=plt.figure(figsize=[6,6])  
-    plt.boxplot(Max_G)
-    axe=plt.gca()
-    axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
-    axe.set_ylabel("Force [N]")
-    axe.set_title("Boxplot des Grip Force maximum par conditions")
-    fig.savefig("figures\Add\GF_%s"%(Name)) 
-    
-    # Load Force 
-    fig=plt.figure(figsize=[6,6])  
-    plt.boxplot(Max_L)
-    axe=plt.gca()
-    axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
-    axe.set_ylabel("Force [N]")
-    axe.set_title("Boxplot des Load Force maximum par conditions")
-    fig.savefig("figures\Add\LF_%s"%(Name))   
-    
-    # Slip Force 
-    fig=plt.figure(figsize=[6,6])  
-    plt.boxplot(Max_SF)
-    axe=plt.gca()
-    axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
-    axe.set_ylabel("Force [N]")
-    axe.set_title("Boxplot des Slip Force maximum par conditions")
-    fig.savefig("figures\Add\SF_%s"%(Name))  
-    
-    # Security marge entre
-    fig=plt.figure(figsize=[6,6])  
-    plt.boxplot(Moy_SME)
-    axe=plt.gca()
-    axe.set_xticklabels(["haut_avec","haut_sans","bas_avec","bas_sans"])
-    axe.set_ylabel("Force [N]")
-    axe.set_title("Boxplot des Security marge moyenne par conditions")
-    fig.savefig("figures\Add\SM_entre_%s"%(Name))  
-    
 # =============================================================================
 #   retourne un tableau contenant les données de tab pour le sujet Name
 #   ce nouveau tableau possède 4 lignes (les 4 conditions), 3 colonnes 

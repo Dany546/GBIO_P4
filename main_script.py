@@ -25,12 +25,12 @@ Mode d'emploi:
     
 @author: Dany
 """
-import gbio_example_script_collisions_dany as gbio
+import gbio_example_script_collisions as gbio
  
 # il faut modifier ces variables pour dire quoi faire (add prévaut sur Delai qui prévaut sur zoom)
 
 # mettre que les sujets dont on veut les plots
-name = 'walid' # put the subjects' names in here
+name = 'alex' # put the subjects' names in here
 ttype = 'all' # sinon n'importe quel autre string
 
 # mettre True  pour faire les moyennes sur les masses et superposer les courbes
@@ -39,11 +39,8 @@ Add = False
 # mettre True pour calculer les décalages moyen entre grip force avec et grip force sans  
 delai = False 
 
-# boxplot des maximums de position
-pos = False
-
-# boxplot des maximums de GF et LF
-force = False
+#
+pos = True 
 
 # mettre True pour zoomer sur un choc en particulier
 zoom = False 
@@ -51,10 +48,9 @@ chock = 'victor_bas_sans_001', 1 # choc sur lequel zoomer: bloc, choc
 
 # a changer que si on veut plot les graphes de base pour un bloc en particulier 
 # dans ce cas, il ne faut pas oublier de mettre False pour add, Delai et zoom   
-# 'all' et 0 pour tt les plots 
 
-bloc = 'all' # sinon: bloc = 'alex_haut_sans' et trial = 1 correspond au fichier alex_haut_sans_001  
-trial = 0    # 0 est la valeur par defaut
+bloc = 'victor_bas_sans' # sinon: bloc = 'alex_haut_sans' et trial = 1 correspond au fichier alex_haut_sans_001  
+trial = 1    # 0 est la valeur par defaut
 
 # ça sert à rien de toucher à ça, 
 # c'est juste pour initialiser les variables 
@@ -63,7 +59,7 @@ start = 0
 end = 0
 
 #%% pour avoir les plots superposes ou calculer le decalage 
-if Add or delai or pos or force: 
+if Add or delai or pos: 
     
     if name == 'alex':
         start = 0
@@ -80,7 +76,7 @@ if Add or delai or pos or force:
     else:
         print("qu'es-ce que c'est encore que cette histoire ???")
     
-    gbio.make_plots(start,end,Name=name,add=Add,Delai=delai,position=pos,Force=force,Type=ttype) 
+    gbio.make_plots(start,end,Name=name,add=Add,Delai=delai,position=pos,Type=ttype) 
     
 #%% pour zoomer sur un choc 
 
